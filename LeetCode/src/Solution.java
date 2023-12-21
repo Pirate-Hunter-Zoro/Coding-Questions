@@ -12,12 +12,6 @@ import java.util.TreeSet;
 public class Solution {
 
     public static void main(String[] args) {
-        int[] nums = new int[] { 758, 334, 402, 1792, 1112, 1436, 1534, 1702, 1538, 1427, 720, 1424, 114, 1604, 564,
-                120, 578 };
-        int[] target = new int[] { 1670, 216, 1392, 1828, 1104, 464, 678, 1134, 644, 1178, 1150, 1608, 1799, 1156, 244,
-                2, 892 };
-        System.out.println(new Solution().makeSimilar(nums, target));
-
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -629,6 +623,7 @@ public class Solution {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Keep track of where a knight can move to given its current position
     private static final int[][] legalMoves = new int[][] { { 4, 6 }, { 6, 8 }, { 7, 9 }, { 4, 8 }, { 3, 9, 0 }, {},
             { 1, 7, 0 }, { 2, 6 }, { 1, 3 }, { 2, 4 } };
 
@@ -1159,6 +1154,9 @@ public class Solution {
      * Do not allocate extra space for another array. You must do this by modifying
      * the input array in-place with O(1) extra memory.
      * 
+     * Link:
+     * https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/
+     * 
      * @param nums
      * @return int
      */
@@ -1218,80 +1216,6 @@ public class Solution {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * There is an integer array nums sorted in non-decreasing order (not
-     * necessarily with distinct values).
-     * 
-     * Before being passed to your function, nums is rotated at an unknown pivot
-     * index k (0 <= k < nums.length) such that the resulting array is [nums[k],
-     * nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]] (0-indexed). For
-     * example, [0,1,2,4,4,4,5,6,6,7] might be rotated at pivot index 5 and become
-     * [4,5,6,6,7,0,1,2,4,4].
-     * 
-     * Given the array nums after the rotation and an integer target, return true if
-     * target is in nums, or false if it is not in nums.
-     * 
-     * You must decrease the overall operation steps as much as possible.
-     * Link: https://leetcode.com/problems/search-in-rotated-sorted-array-ii/
-     * 
-     * @param nums
-     * @param target
-     * @return boolean
-     */
-    public boolean search(int[] nums, int target) {
-        // Edge case
-        if (nums.length == 1)
-            return nums[0] == target;
-
-        // Binary search for pivot
-        int left = 0;
-        int right = nums.length - 1;
-        int pivot = 0;
-        while (left < right) {
-            int mid = (left + right) / 2;
-            if (nums[mid - 1] > nums[mid]) {
-                pivot = mid;
-                break;
-            } else if (nums[left] > nums[mid]) { // pivot is in the left
-                right = mid;
-            } else if (nums[right] < nums[mid]) { // pivot is in the right
-                left = mid;
-            } else { // pivot could be on either side
-
-            }
-        }
-
-        // Quick check at the pivot
-        if (nums[pivot] == target) {
-            return true;
-        }
-
-        return false;
-
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Given a positive integer n, generate an n x n matrix filled with elements
-     * from 1 to n^2 in spiral order.
-     * 
-     * Link:
-     * https://leetcode.com/problems/spiral-matrix-ii/
-     * 
-     * @param n
-     * @return int[][]
-     */
-    public int[][] generateMatrix(int n) {
-        int[][] matrix = new int[n][n];
-
-        return matrix;
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
      * There are 3n piles of coins of varying size, you and your friends will take
      * piles of coins as follows:
      * 
@@ -1320,124 +1244,6 @@ public class Solution {
             max += piles[i];
 
         return max;
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * You are given two positive integer arrays nums and target, of the same
-     * length.
-     * 
-     * In one operation, you can choose any two distinct indices i and j where 0 <=
-     * i, j < nums.length and:
-     * 
-     * set nums[i] = nums[i] + 2 and
-     * set nums[j] = nums[j] - 2.
-     * Two arrays are considered to be similar if the frequency of each element is
-     * the same.
-     * 
-     * Return the minimum number of operations required to make nums similar to
-     * target. The test cases are generated such that nums can always be similar to
-     * target.
-     * 
-     * Link:
-     * https://leetcode.com/problems/minimum-number-of-operations-to-make-arrays-similar/description/
-     * 
-     * @param nums
-     * @param target
-     * @return long
-     */
-    public long makeSimilar(int[] nums, int[] target) {
-        long totalMoves = 0l;
-
-        // Sorting is important for the purposes of knowing which numbers in nums become
-        // which numbers in target
-        Arrays.sort(nums);
-        Arrays.sort(target);
-
-        // Find the even and odd numbers
-        ArrayList<Integer> evensNums = new ArrayList<>();
-        ArrayList<Integer> oddsNums = new ArrayList<>();
-        ArrayList<Integer> evensTarget = new ArrayList<>();
-        ArrayList<Integer> oddsTarget = new ArrayList<>();
-        for (int j : nums) {
-            if ((j % 2) == 0)
-                evensNums.add(j);
-            else
-                oddsNums.add(j);
-        }
-        for (int j : target) {
-            if ((j % 2) == 0)
-                evensTarget.add(j);
-            else
-                oddsTarget.add(j);
-        }
-
-        // Find the differences between each of the even values - those are gaps we need
-        // to bridge via operations
-        int[] evensDifferences = new int[evensNums.size()];
-        // Find the differences between each of the odd values - again those are gaps we
-        // need to bridge
-        int[] oddsDifferences = new int[oddsNums.size()];
-        for (int i = 0; i < evensNums.size(); i++)
-            evensDifferences[i] = evensNums.get(i) - evensTarget.get(i);
-        for (int i = 0; i < oddsNums.size(); i++)
-            oddsDifferences[i] = oddsNums.get(i) - oddsTarget.get(i);
-
-        // We know that it WILL be possible to make the arrays similar - that conserves
-        // the sum
-        Arrays.sort(evensDifferences);
-        Arrays.sort(oddsDifferences);
-        // We can linearly merge this now
-        int[] differences = new int[nums.length];
-        int evensIndex = 0;
-        int oddsIndex = 0;
-        int differencesIndex = 0;
-        while (evensIndex < evensDifferences.length && oddsIndex < oddsDifferences.length) {
-            int evenDifference = evensDifferences[evensIndex];
-            int oddDifference = oddsDifferences[oddsIndex];
-            if (evenDifference <= oddDifference) {
-                differences[differencesIndex] = evenDifference;
-                evensIndex++;
-            } else {
-                differences[differencesIndex] = oddDifference;
-                oddsIndex++;
-            }
-            differencesIndex++;
-        }
-        while (evensIndex < evensDifferences.length) {
-            differences[differencesIndex] = evensDifferences[evensIndex];
-            evensIndex++;
-            differencesIndex++;
-        }
-        while (oddsIndex < oddsDifferences.length) {
-            differences[differencesIndex] = oddsDifferences[oddsIndex];
-            oddsIndex++;
-            differencesIndex++;
-        }
-
-        // Now that we have our sorted array of differences that we have to bridge, we
-        // can count the operations needed
-        // Recall that we ARE guaranteed achieving similarity - i.e. identical sorted
-        // arrays - is possible
-        while (differences[0] < 0 || differences[differences.length - 1] > 0) {
-            for (int i = 0; i < differences.length / 2; i++) {
-                int j = differences.length - 1 - i;
-                if (differences[i] == 0 || differences[j] == 0)
-                    break;
-                int biggestIncreaseNeeded = -1 * differences[i];
-                int biggestDecreaseNeeded = differences[j];
-                int smaller = (biggestIncreaseNeeded <= biggestDecreaseNeeded) ? biggestIncreaseNeeded
-                        : biggestDecreaseNeeded;
-                totalMoves += ((long) smaller) / 2l;
-                differences[i] += smaller;
-                differences[j] -= smaller;
-            }
-            Arrays.sort(differences);
-        }
-
-        return totalMoves;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
