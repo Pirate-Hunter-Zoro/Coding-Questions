@@ -1463,4 +1463,66 @@ public class Solution {
         return sols[n-1];
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The pair sum of a pair (a,b) is equal to a + b. The maximum pair sum is the
+     * largest pair sum in a list of pairs.
+     * 
+     * For example, if we have pairs (1,5), (2,3), and (4,4), the maximum pair sum
+     * would be max(1+5, 2+3, 4+4) = max(6, 5, 8) = 8.
+     * Given an array nums of even length n, pair up the elements of nums into n / 2
+     * pairs such that:
+     * 
+     * Each element of nums is in exactly one pair, and
+     * The maximum pair sum is minimized.
+     * Return the minimized maximum pair sum after optimally pairing up the
+     * elements.
+     * 
+     * Link:
+     * https://leetcode.com/problems/minimize-maximum-pair-sum-in-array/?envType=daily-question&envId=2023-12-22
+     * 
+     * @param nums
+     * @return
+     */
+    public int minPairSum(int[] nums) {
+        // We know that there are an even amount of numbers
+        Arrays.sort(nums);
+
+        // Further, now that the array is sorted, the lowest maximal pair sum can be achieved by taking one value from the lower half, and one value from the upper half.
+        // Proof:
+
+        // Case 1:
+        // Suppose the lowest maximal sum can be two values from the lower half:
+        // - That leaves the upper half values all being equal to these two lower half values, and the two lower half values are equal. 
+        // - If this were not the case, then any two upper half values - one of which we know exists in this pairing - form a sum greater than this supposed maximal sum, a contradiction. 
+        // - Since we know those upper half values are equal to the two (equal) lower half values, any two of those upper half values - one of which we know exists in this pairing - form a sum equal to this maximal pair sum value.
+        // Hence, if (l1, l2) form the minimum maximal pair, then we have an (u1, u2) which also does, leading into Case 2.
+
+        // Case 2:
+        // Suppose (u1, u2) form a minimum maximal pair. Then (l1, l2) also exist in this pairing.
+        // - Note that we can rearrange this pairing with only these four elements and touching no other elements, while achieving at least as small of a maximal pair.
+        // - Said new minimum pair is min{u1 + l1, u1 + l2, u2 + l1, u2 + l2}
+        //  - Suppose you have a pair (u3, u4) such that u3 + u4 < min{u1 + l1, u1 + l2, u2 + l1, u2 + l2}?
+        //  - Then the pairing must also have a new (l3, l4) pair, and the same argument applies until we run out of purely upper pairs.
+        // Hence, the lowest maximal pair sum can be achieved by taking one value from the lower half and one value from the upper half.
+
+        // Case 3:
+        // Suppose (l1, u1) form a minimum maximal pair. Trivially, we are done.
+
+        // So we know that we CAN achieve the minimum maximal value by finding the right pair with one element from the left and one element from the right
+        int minMaximalPairSum = Integer.MIN_VALUE;
+        // Now we iterate through the sorted list of numbers
+        for (int i=0; i<nums.length/2; i++) {
+            int j = nums.length-1-i;
+            // The first value will be paired with the last. If the first pair is going to achieve the minimum maximal pair sum, it must do so with the last value.
+            // Suppose that the first value paired with some other value. Then the last value is only going to be paired with something bigger, increasing the maximal pair sum.
+            // Similarly, the second value will be paired with the second to last. Through this inductive reasoning, we can see that nums[i] is paired with nums[nums.length-1-i] to achieve the minimum maximal pair sum.
+            minMaximalPairSum = Math.max(nums[i] + nums[j], minMaximalPairSum); // Take the maximum each time to find out what the actual minimum MAXIMAL pair sum is.
+        }
+
+        return minMaximalPairSum;
+    }
+
 }
