@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Stack;
 import java.util.TreeSet;
+import java.util.stream.IntStream;
 
 public class Solution {
 
@@ -1404,6 +1405,7 @@ public class Solution {
 
     /**
      * Method to copy a TreeNode
+     * 
      * @param source
      * @return {@link TreeNode}
      */
@@ -1441,13 +1443,13 @@ public class Solution {
         List<TreeNode> oneNode = new ArrayList<>();
         oneNode.add(new TreeNode());
         sols[0] = oneNode;
-        for (int i=2; i<n; i+=2) {
+        for (int i = 2; i < n; i += 2) {
             List<TreeNode> roots = new ArrayList<>();
-            int numNodes = i+1;
+            int numNodes = i + 1;
             for (int numLeft = 1; numLeft < numNodes; numLeft += 2) {
                 int numRight = numNodes - 1 - numLeft;
-                List<TreeNode> rootsLeft = sols[numLeft-1]; // all possible left roots
-                List<TreeNode> rootsRight = sols[numRight-1]; // all possible right roots
+                List<TreeNode> rootsLeft = sols[numLeft - 1]; // all possible left roots
+                List<TreeNode> rootsRight = sols[numRight - 1]; // all possible right roots
                 for (TreeNode leftRoot : rootsLeft) {
                     for (TreeNode rightRoot : rootsRight) {
                         TreeNode leftCopy = copy(leftRoot);
@@ -1457,10 +1459,10 @@ public class Solution {
                     }
                 }
             }
-            sols[numNodes-1] = roots;
+            sols[numNodes - 1] = roots;
         }
 
-        return sols[n-1];
+        return sols[n - 1];
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1484,45 +1486,251 @@ public class Solution {
      * https://leetcode.com/problems/minimize-maximum-pair-sum-in-array/?envType=daily-question&envId=2023-12-22
      * 
      * @param nums
-     * @return
+     * @return int
      */
     public int minPairSum(int[] nums) {
         // We know that there are an even amount of numbers
         Arrays.sort(nums);
 
-        // Further, now that the array is sorted, the lowest maximal pair sum can be achieved by taking one value from the lower half, and one value from the upper half.
+        // Further, now that the array is sorted, the lowest maximal pair sum can be
+        // achieved by taking one value from the lower half, and one value from the
+        // upper half.
         // Proof:
 
         // Case 1:
         // Suppose the lowest maximal sum can be two values from the lower half:
-        // - That leaves the upper half values all being equal to these two lower half values, and the two lower half values are equal. 
-        // - If this were not the case, then any two upper half values - one of which we know exists in this pairing - form a sum greater than this supposed maximal sum, a contradiction. 
-        // - Since we know those upper half values are equal to the two (equal) lower half values, any two of those upper half values - one of which we know exists in this pairing - form a sum equal to this maximal pair sum value.
-        // Hence, if (l1, l2) form the minimum maximal pair, then we have an (u1, u2) which also does, leading into Case 2.
+        // - That leaves the upper half values all being equal to these two lower half
+        // values, and the two lower half values are equal.
+        // - If this were not the case, then any two upper half values - one of which we
+        // know exists in this pairing - form a sum greater than this supposed maximal
+        // sum, a contradiction.
+        // - Since we know those upper half values are equal to the two (equal) lower
+        // half values, any two of those upper half values - one of which we know exists
+        // in this pairing - form a sum equal to this maximal pair sum value.
+        // Hence, if (l1, l2) form the minimum maximal pair, then we have an (u1, u2)
+        // which also does, leading into Case 2.
 
         // Case 2:
-        // Suppose (u1, u2) form a minimum maximal pair. Then (l1, l2) also exist in this pairing.
-        // - Note that we can rearrange this pairing with only these four elements and touching no other elements, while achieving at least as small of a maximal pair.
+        // Suppose (u1, u2) form a minimum maximal pair. Then (l1, l2) also exist in
+        // this pairing.
+        // - Note that we can rearrange this pairing with only these four elements and
+        // touching no other elements, while achieving at least as small of a maximal
+        // pair.
         // - Said new minimum pair is min{u1 + l1, u1 + l2, u2 + l1, u2 + l2}
-        //  - Suppose you have a pair (u3, u4) such that u3 + u4 < min{u1 + l1, u1 + l2, u2 + l1, u2 + l2}?
-        //  - Then the pairing must also have a new (l3, l4) pair, and the same argument applies until we run out of purely upper pairs.
-        // Hence, the lowest maximal pair sum can be achieved by taking one value from the lower half and one value from the upper half.
+        // - Suppose you have a pair (u3, u4) such that u3 + u4 < min{u1 + l1, u1 + l2,
+        // u2 + l1, u2 + l2}?
+        // - Then the pairing must also have a new (l3, l4) pair, and the same argument
+        // applies until we run out of purely upper pairs.
+        // Hence, the lowest maximal pair sum can be achieved by taking one value from
+        // the lower half and one value from the upper half.
 
         // Case 3:
         // Suppose (l1, u1) form a minimum maximal pair. Trivially, we are done.
 
-        // So we know that we CAN achieve the minimum maximal value by finding the right pair with one element from the left and one element from the right
+        // So we know that we CAN achieve the minimum maximal value by finding the right
+        // pair with one element from the left and one element from the right
         int minMaximalPairSum = Integer.MIN_VALUE;
         // Now we iterate through the sorted list of numbers
-        for (int i=0; i<nums.length/2; i++) {
-            int j = nums.length-1-i;
-            // The first value will be paired with the last. If the first pair is going to achieve the minimum maximal pair sum, it must do so with the last value.
-            // Suppose that the first value paired with some other value. Then the last value is only going to be paired with something bigger, increasing the maximal pair sum.
-            // Similarly, the second value will be paired with the second to last. Through this inductive reasoning, we can see that nums[i] is paired with nums[nums.length-1-i] to achieve the minimum maximal pair sum.
-            minMaximalPairSum = Math.max(nums[i] + nums[j], minMaximalPairSum); // Take the maximum each time to find out what the actual minimum MAXIMAL pair sum is.
+        for (int i = 0; i < nums.length / 2; i++) {
+            int j = nums.length - 1 - i;
+            // The first value will be paired with the last. If the first pair is going to
+            // achieve the minimum maximal pair sum, it must do so with the last value.
+            // Suppose that the first value paired with some other value. Then the last
+            // value is only going to be paired with something bigger, increasing the
+            // maximal pair sum.
+            // Similarly, the second value will be paired with the second to last. Through
+            // this inductive reasoning, we can see that nums[i] is paired with
+            // nums[nums.length-1-i] to achieve the minimum maximal pair sum.
+            minMaximalPairSum = Math.max(nums[i] + nums[j], minMaximalPairSum); // Take the maximum each time to find
+                                                                                // out what the actual minimum MAXIMAL
+                                                                                // pair sum is.
         }
 
         return minMaximalPairSum;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * You want to schedule a list of jobs in d days. Jobs are dependent (i.e To
+     * work on the ith job, you have to finish all the jobs j where 0 <= j < i).
+     * 
+     * You have to finish at least one task every day. The difficulty of a job
+     * schedule is the sum of difficulties of each day of the d days. The difficulty
+     * of a day is the maximum difficulty of a job done on that day.
+     * 
+     * You are given an integer array jobDifficulty and an integer d. The difficulty
+     * of the ith job is jobDifficulty[i].
+     * 
+     * Return the minimum difficulty of a job schedule. If you cannot find a
+     * schedule for the jobs return -1.
+     * 
+     * 
+     * Link:
+     * https://leetcode.com/problems/minimum-difficulty-of-a-job-schedule/?envType=daily-question&envId=2023-12-29
+     * 
+     * @param jobDifficulty
+     * @param d
+     * @return int
+     */
+    public int minDifficulty(int[] jobDifficulty, int d) {
+        // The real question is, how do you partition the array of chores into different
+        // days?
+        // First, some edge cases:
+        if (jobDifficulty.length < d)
+            return -1;
+        else if (jobDifficulty.length == d)
+            return Arrays.stream(jobDifficulty).sum();
+
+        // Keep track of the greatest element from each index to the right.
+        int[] greatestFromHere = new int[jobDifficulty.length];
+        greatestFromHere[greatestFromHere.length - 1] = jobDifficulty[jobDifficulty.length - 1];
+        for (int i = jobDifficulty.length - 2; i >= 0; i--) {
+            greatestFromHere[i] = Math.max(jobDifficulty[i], greatestFromHere[i + 1]);
+        }
+
+        // Let's start with the first 'd' tasks optimally partitioned - it is impossible
+        // to partition any fewer.
+        int[] sols = new int[jobDifficulty.length];
+        // TODO - finish this problem 
+        // We won't care about any index smaller than 'd-1'.
+
+        return sols[sols.length - 1];
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * We have n jobs, where every job is scheduled to be done from startTime[i] to
+     * endTime[i], obtaining a profit of profit[i].
+     * 
+     * You're given the startTime, endTime and profit arrays, return the maximum
+     * profit you can take such that there are no two jobs in the subset with
+     * overlapping time range.
+     * 
+     * If you choose a job that ends at time X you will be able to start another job
+     * that starts at time X.
+     * 
+     * Link:
+     * https://leetcode.com/problems/maximum-profit-in-job-scheduling/?envType=daily-question&envId=2024-01-08
+     * 
+     * @param startTime
+     * @param endTime
+     * @param profit
+     * @return int
+     */
+    public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
+        Job[] jobs = new Job[startTime.length];
+        for (int i = 0; i < jobs.length; i++) {
+            jobs[i] = new Job(startTime[i], endTime[i], profit[i]);
+        }
+        Arrays.sort(jobs, Job.JOB_COMPARATOR);
+
+        int[] maxProfit = new int[jobs.length];
+        maxProfit[0] = jobs[0].getProfit();
+        for (int i = 1; i < maxProfit.length; i++) {
+            // Try to include this job
+            int includeJob = jobs[i].getProfit();
+            int prevJobIndex = findJobIndex(jobs, jobs[i].getStartTime(), i);
+            if (prevJobIndex != -1)
+                includeJob += maxProfit[prevJobIndex];
+
+            maxProfit[i] = Math.max(includeJob, maxProfit[i - 1]);
+        }
+
+        return maxProfit[maxProfit.length - 1];
+    }
+
+    /**
+     * Helper method to binary search for a job whose end time is no later than the
+     * input parameter 'endByThisTime'
+     * 
+     * @param jobs
+     * @param endByThisTime
+     * @return int
+     */
+    private int findJobIndex(Job[] jobs, int endByThisTime, int earlierThanThisIndex) {
+        int left = 0;
+        int right = earlierThanThisIndex;
+        while (left < right) {
+            int mid = (left + right) / 2;
+            if (mid == left)
+                break;
+            if (jobs[mid].getEndTime() > endByThisTime) {
+                // go left half
+                right = mid;
+            } else {
+                // go right half
+                left = mid;
+            }
+        }
+
+        return (jobs[left].getEndTime() <= endByThisTime) ? left : -1;
+    }
+
+    /**
+     * Store all of the information associated with a Job
+     */
+    private static class Job {
+        private int startTime;
+        private int endTime;
+        private int profit;
+
+        public static final Comparator<Job> JOB_COMPARATOR = (j1, j2) -> Integer.compare(j1.getEndTime(),
+                j2.getEndTime());
+
+        public Job(int startTime, int endTime, int profit) {
+            this.startTime = startTime;
+            this.endTime = endTime;
+            this.profit = profit;
+        }
+
+        public int getStartTime() {
+            return startTime;
+        }
+
+        public int getEndTime() {
+            return endTime;
+        }
+
+        public int getProfit() {
+            return profit;
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Given an integer array nums, return the number of all the arithmetic
+     * subsequences of nums.
+     * 
+     * A sequence of numbers is called arithmetic if it consists of at least three
+     * elements and if the difference between any two consecutive elements is the
+     * same.
+     * 
+     * For example, [1, 3, 5, 7, 9], [7, 7, 7, 7], and [3, -1, -5, -9] are
+     * arithmetic sequences.
+     * For example, [1, 1, 2, 5, 7] is not an arithmetic sequence.
+     * A subsequence of an array is a sequence that can be formed by removing some
+     * elements (possibly none) of the array.
+     * 
+     * For example, [2,5,10] is a subsequence of [1,2,1,2,4,1,5,10].
+     * The test cases are generated so that the answer fits in 32-bit integer.
+     * 
+     * Link:
+     * https://leetcode.com/problems/arithmetic-slices-ii-subsequence/?envType=daily-question&envId=2024-01-08
+     * 
+     * @param nums
+     * @return int
+     */
+    public int numberOfArithmeticSlices(int[] nums) {
+        int numSequences = 0;
+
+
+        return numSequences;
     }
 
 }
