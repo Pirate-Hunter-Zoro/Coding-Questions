@@ -8,11 +8,15 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Stack;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Solution {
 
     public static void main(String[] args) {
+        TreeNode root = new TreeNode(9, new TreeNode(6), new TreeNode(-3, new TreeNode(-6),
+                new TreeNode(2, null, new TreeNode(2, new TreeNode(-6, new TreeNode(-6), new TreeNode(-6)), null))));
+        int maxPath = new Solution().maxPathSum(root);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1593,7 +1597,7 @@ public class Solution {
         // Let's start with the first 'd' tasks optimally partitioned - it is impossible
         // to partition any fewer.
         int[] sols = new int[jobDifficulty.length];
-        // TODO - finish this problem 
+        // TODO - finish this problem
         // We won't care about any index smaller than 'd-1'.
 
         return sols[sols.length - 1];
@@ -1729,8 +1733,132 @@ public class Solution {
     public int numberOfArithmeticSlices(int[] nums) {
         int numSequences = 0;
 
-
         return numSequences;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Given the root of a binary tree, return the bottom-up level order traversal
+     * of its nodes' values. (i.e., from left to right, level by level from leaf to
+     * root).
+     * 
+     * Link:
+     * https://leetcode.com/problems/binary-tree-level-order-traversal-ii/description/
+     * 
+     * @param root
+     * @return List<List<Integer>>
+     */
+    public List<List<Integer>> levelOrderBottom(TreeNode root) {
+        if (root == null)
+            return new ArrayList<>();
+
+        List<List<Integer>> normalOrder = new ArrayList<>();
+        List<TreeNode> currentLevel = new ArrayList<>();
+        currentLevel.add(root);
+
+        while (!(currentLevel.isEmpty())) {
+            // Source:
+            // https://www.java67.com/2019/03/how-to-convert-int-array-to-arraylist-in-java-8-example.html
+            normalOrder.add(IntStream.of(currentLevel.stream().mapToInt((node) -> node.val).toArray()).boxed()
+                    .collect(Collectors.toCollection(ArrayList::new)));
+            List<TreeNode> nextLevel = new ArrayList<>();
+            for (TreeNode node : currentLevel) {
+                if (node.left != null) {
+                    nextLevel.add(node.left);
+                }
+                if (node.right != null) {
+                    nextLevel.add(node.right);
+                }
+            }
+            currentLevel = nextLevel;
+        }
+
+        List<List<Integer>> reverseOrder = new ArrayList<>();
+        for (int i = normalOrder.size() - 1; i >= 0; i--) {
+            reverseOrder.add(normalOrder.get(i));
+        }
+
+        return reverseOrder;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * A path in a binary tree is a sequence of nodes where each pair of adjacent
+     * nodes in the sequence has an edge connecting them. A node can only appear in
+     * the sequence at most once. Note that the path does not need to pass through
+     * the root.
+     * 
+     * The path sum of a path is the sum of the node's values in the path.
+     * 
+     * Given the root of a binary tree, return the maximum path sum of any non-empty
+     * path.
+     * 
+     * Link:
+     * https://leetcode.com/problems/binary-tree-maximum-path-sum/
+     * 
+     * @param root
+     * @return int
+     */
+    public int maxPathSum(TreeNode root) {
+        TreePathNode.resetRecordPath();
+
+        // No need to name this - the static record path value will be found
+        new TreePathNode(root);
+
+        return TreePathNode.getRecordPath();
+    }
+
+    private static class TreePathNode extends TreeNode {
+
+        private static int recordPath = Integer.MIN_VALUE;
+
+        public static int getRecordPath() {
+            return recordPath;
+        }
+
+        public static void resetRecordPath() {
+            recordPath = Integer.MIN_VALUE;
+        }
+
+        private int pathSumAllowLeftOnly;
+
+        private int pathSumAllowRightOnly;
+
+        private int pathSumAllowBoth;
+
+        private TreePathNode leftPathNode;
+
+        private TreePathNode rightPathNode;
+
+        public TreePathNode(TreeNode source) {
+            this.left = source.left;
+            this.val = source.val;
+            this.right = source.right;
+
+            this.leftPathNode = (this.left != null) ? new TreePathNode(this.left) : null;
+            this.rightPathNode = (this.right != null) ? new TreePathNode(this.right) : null;
+
+            pathSumAllowLeftOnly = this.val;
+            pathSumAllowRightOnly = this.val;
+
+            if (this.leftPathNode != null)
+                pathSumAllowLeftOnly += Math.max(this.leftPathNode.pathSumAllowLeftOnly,
+                        this.leftPathNode.pathSumAllowRightOnly);
+
+            if (this.rightPathNode != null)
+                pathSumAllowRightOnly += Math.max(this.rightPathNode.pathSumAllowLeftOnly,
+                        this.rightPathNode.pathSumAllowRightOnly);
+
+            this.pathSumAllowBoth = Math.max(this.val, Math.max(pathSumAllowLeftOnly + pathSumAllowRightOnly - this.val,
+                    Math.max(pathSumAllowLeftOnly, pathSumAllowRightOnly)));
+
+            recordPath = Math.max(recordPath, pathSumAllowBoth);
+        }
+
     }
 
 }
