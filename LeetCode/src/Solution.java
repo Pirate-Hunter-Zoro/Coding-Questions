@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -1733,6 +1734,8 @@ public class Solution {
     public int numberOfArithmeticSlices(int[] nums) {
         int numSequences = 0;
 
+        // TODO - finish this problem
+
         return numSequences;
     }
 
@@ -1859,6 +1862,71 @@ public class Solution {
             recordPath = Math.max(recordPath, pathSumAllowBoth);
         }
 
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * You are given an integer array matches where matches[i] = [winneri, loseri]
+     * indicates that the player winneri defeated player loseri in a match.
+     * 
+     * Return a list answer of size 2 where:
+     * 
+     * answer[0] is a list of all players that have not lost any matches.
+     * answer[1] is a list of all players that have lost exactly one match.
+     * The values in the two lists should be returned in increasing order.
+     * 
+     * Note:
+     * 
+     * You should only consider the players that have played at least one match.
+     * The testcases will be generated such that no two matches will have the same
+     * outcome.
+     * 
+     * Link:
+     * https://leetcode.com/problems/find-players-with-zero-or-one-losses/description/?envType=daily-question&envId=2024-01-15
+     * 
+     * @param matches
+     * @return List<List<Integer>>
+     */
+    public List<List<Integer>> findWinners(int[][] matches) {
+        HashSet<Integer> losers = new HashSet<>();
+        HashSet<Integer> lostOnce = new HashSet<>();
+        HashSet<Integer> played = new HashSet<>();
+        HashSet<Integer> lostMultiple = new HashSet<>();
+        int maxPlayer = 1;
+        for (int[] match : matches) {
+            played.add(match[0]);
+            played.add(match[1]);
+            losers.add(match[1]);
+            maxPlayer = Math.max(maxPlayer, Math.max(match[0], match[1]));
+            if (lostOnce.contains(match[1]) || lostMultiple.contains(match[1])) {
+                if (lostOnce.contains(match[1])) {
+                    lostOnce.remove(match[1]);
+                    lostMultiple.add(match[1]);
+                }
+            } else
+                lostOnce.add(match[1]);
+        }
+
+        List<Integer> noLosses = new ArrayList<>();
+        for (int player : played) {
+            if (!losers.contains(player))
+                noLosses.add(player);
+        }
+
+        List<Integer> lostOnceList = new ArrayList<>();
+        for (int player : lostOnce)
+            lostOnceList.add(player);
+
+        noLosses.sort(Integer::compare);
+        lostOnceList.sort(Integer::compare);
+
+        List<List<Integer>> toReturn = new ArrayList<>();
+        toReturn.add(noLosses);
+        toReturn.add(lostOnceList);
+
+        return toReturn;
     }
 
 }
