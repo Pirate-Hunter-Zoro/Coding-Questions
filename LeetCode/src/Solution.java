@@ -15,9 +15,10 @@ import java.util.stream.IntStream;
 public class Solution {
 
     public static void main(String[] args) {
-        TreeNode root = new TreeNode(9, new TreeNode(6), new TreeNode(-3, new TreeNode(-6),
-                new TreeNode(2, null, new TreeNode(2, new TreeNode(-6, new TreeNode(-6), new TreeNode(-6)), null))));
-        int maxPath = new Solution().maxPathSum(root);
+        int[] jobDifficulty = new int[] { 1, 1, 1 };
+        int days = 3;
+        int v = new Solution().minDifficulty(jobDifficulty, days);
+        System.out.println(v);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1582,26 +1583,64 @@ public class Solution {
     public int minDifficulty(int[] jobDifficulty, int d) {
         // The real question is, how do you partition the array of chores into different
         // days?
-        // First, some edge cases:
-        if (jobDifficulty.length < d)
+        if (d > jobDifficulty.length) // then not every day can have a job
             return -1;
-        else if (jobDifficulty.length == d)
-            return Arrays.stream(jobDifficulty).sum();
 
-        // Keep track of the greatest element from each index to the right.
-        int[] greatestFromHere = new int[jobDifficulty.length];
-        greatestFromHere[greatestFromHere.length - 1] = jobDifficulty[jobDifficulty.length - 1];
-        for (int i = jobDifficulty.length - 2; i >= 0; i--) {
-            greatestFromHere[i] = Math.max(jobDifficulty[i], greatestFromHere[i + 1]);
+        int[][] sols = new int[d][jobDifficulty.length];
+        for (int i = 0; i < sols.length - 1; i++) {
+            for (int j = 0; j < sols[i].length; j++) {
+                sols[i][j] = Integer.MAX_VALUE;
+            }
+        }
+        // Now we can cover the base case if we only have one day to work with
+        int[] maxFromHere = new int[jobDifficulty.length];
+        maxFromHere[maxFromHere.length - 1] = jobDifficulty[jobDifficulty.length - 1];
+        for (int i = maxFromHere.length - 2; i >= 0; i--) {
+            maxFromHere[i] = Math.max(maxFromHere[i + 1], jobDifficulty[i]);
+        }
+        for (int j = 0; j < sols[sols.length - 1].length; j++) {
+            sols[sols.length - 1][j] = maxFromHere[j];
+        }
+        return topDownMinDifficulty(jobDifficulty, sols, d, 0, 0);
+    }
+
+    /**
+     * Recursive helper method to find the optimal way to schedule jobs on
+     * particular days to minimize total difficulty
+     * 
+     * @param jobDifficulty
+     * @param sols
+     * @param dayIdx
+     * @param choreIdx
+     * @return int
+     */
+    private int topDownMinDifficulty(int[] jobDifficulty, int[][] sols, int days, int dayIdx, int choreIdx) {
+        if (sols[dayIdx][choreIdx] != Integer.MAX_VALUE)
+            return sols[dayIdx][choreIdx];
+
+        int best = Integer.MAX_VALUE;
+        int choresTaken = 0;
+        int todayDifficulty = Integer.MIN_VALUE;
+        while ((choresTaken < jobDifficulty.length - choreIdx - 1)
+                && (days - dayIdx - 1 <= jobDifficulty.length - (choreIdx + choresTaken + 1))) { // we still have jobs
+                                                                                                 // to give and we can
+                                                                                                 // take another job on
+                                                                                                 // this day and still
+                                                                                                 // be able to give all
+                                                                                                 // remaining days at
+                                                                                                 // least one job
+            choresTaken += 1;
+            todayDifficulty = Math.max(todayDifficulty, jobDifficulty[choreIdx + choresTaken - 1]); // the maximum
+                                                                                                    // difficulty of all
+                                                                                                    // the jobs we have
+                                                                                                    // taken
+            best = Math.min(best, todayDifficulty
+                    + topDownMinDifficulty(jobDifficulty, sols, days, dayIdx + 1, choreIdx + choresTaken));
         }
 
-        // Let's start with the first 'd' tasks optimally partitioned - it is impossible
-        // to partition any fewer.
-        int[] sols = new int[jobDifficulty.length];
-        // TODO - finish this problem
-        // We won't care about any index smaller than 'd-1'.
+        sols[dayIdx][choreIdx] = best;
 
-        return sols[sols.length - 1];
+        return best;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1848,14 +1887,12 @@ public class Solution {
             pathSumAllowLeftOnly = this.val;
             if (this.leftPathNode != null) {
                 pathSumAllowLeftOnly += Math.max(0,
-                    Math.max(this.leftPathNode.pathSumAllowLeftOnly, this.leftPathNode.pathSumAllowRightOnly)
-                );
+                        Math.max(this.leftPathNode.pathSumAllowLeftOnly, this.leftPathNode.pathSumAllowRightOnly));
             }
             pathSumAllowRightOnly = this.val;
             if (this.rightPathNode != null) {
                 pathSumAllowRightOnly += Math.max(0,
-                    Math.max(this.rightPathNode.pathSumAllowLeftOnly, this.rightPathNode.pathSumAllowRightOnly)
-                );
+                        Math.max(this.rightPathNode.pathSumAllowLeftOnly, this.rightPathNode.pathSumAllowRightOnly));
             }
 
             // Avoid double counting the current node value
@@ -1929,6 +1966,29 @@ public class Solution {
         toReturn.add(lostOnceList);
 
         return toReturn;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * You are given two strings of the same length s and t. In one step you can
+     * choose any character of t and replace it with another character.
+     * 
+     * Return the minimum number of steps to make t an anagram of s.
+     * 
+     * An Anagram of a string is a string that contains the same characters with a
+     * different (or the same) ordering.
+     * 
+     * Link:
+     * https://leetcode.com/problems/minimum-number-of-steps-to-make-two-strings-anagram/description/?envType=daily-question&envId=2024-01-18
+     * 
+     * @param s
+     * @param t
+     * @return int
+     */
+    public int minSteps(String s, String t) {
+        return 0;
     }
 
 }
