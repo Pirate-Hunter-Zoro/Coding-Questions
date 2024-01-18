@@ -1846,18 +1846,20 @@ public class Solution {
             this.rightPathNode = (this.right != null) ? new TreePathNode(this.right) : null;
 
             pathSumAllowLeftOnly = this.val;
+            if (this.leftPathNode != null) {
+                pathSumAllowLeftOnly += Math.max(0,
+                    Math.max(this.leftPathNode.pathSumAllowLeftOnly, this.leftPathNode.pathSumAllowRightOnly)
+                );
+            }
             pathSumAllowRightOnly = this.val;
+            if (this.rightPathNode != null) {
+                pathSumAllowRightOnly += Math.max(0,
+                    Math.max(this.rightPathNode.pathSumAllowLeftOnly, this.rightPathNode.pathSumAllowRightOnly)
+                );
+            }
 
-            if (this.leftPathNode != null)
-                pathSumAllowLeftOnly += Math.max(this.leftPathNode.pathSumAllowLeftOnly,
-                        this.leftPathNode.pathSumAllowRightOnly);
-
-            if (this.rightPathNode != null)
-                pathSumAllowRightOnly += Math.max(this.rightPathNode.pathSumAllowLeftOnly,
-                        this.rightPathNode.pathSumAllowRightOnly);
-
-            this.pathSumAllowBoth = Math.max(this.val, Math.max(pathSumAllowLeftOnly + pathSumAllowRightOnly - this.val,
-                    Math.max(pathSumAllowLeftOnly, pathSumAllowRightOnly)));
+            // Avoid double counting the current node value
+            pathSumAllowBoth = pathSumAllowLeftOnly + pathSumAllowRightOnly - this.val;
 
             recordPath = Math.max(recordPath, pathSumAllowBoth);
         }
