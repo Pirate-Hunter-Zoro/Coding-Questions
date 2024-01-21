@@ -1988,7 +1988,84 @@ public class Solution {
      * @return int
      */
     public int minSteps(String s, String t) {
-        return 0;
+        HashMap<Character, Integer> targetCounts = new HashMap<>();
+        HashMap<Character, Integer> currentCounts = new HashMap<>();
+        for (int i=0; i<t.length(); i++) {
+            char c = t.charAt(i);
+            if (targetCounts.containsKey(c))
+                targetCounts.put(c, targetCounts.get(c)+1);
+            else
+                targetCounts.put(c, 1);
+        }
+        for (int j=0; j<s.length(); j++) {
+            char c = s.charAt(j);
+            if (currentCounts.containsKey(c))
+                currentCounts.put(c, currentCounts.get(c)+1);
+            else
+                currentCounts.put(c, 1);
+        }
+
+        int moves = 0;
+        for (char c : currentCounts.keySet()) {
+            if (targetCounts.containsKey(c) && targetCounts.get(c) < currentCounts.get(c)) {
+                moves += currentCounts.get(c) - targetCounts.get(c);
+            } else if (!targetCounts.containsKey(c)) {
+                moves += currentCounts.get(c);
+            }
+        }
+
+        return moves;
+    }
+
+    /**
+     * You are given two strings s and t. In one step, you can append any character
+     * to either s or t.
+     * 
+     * Return the minimum number of steps to make s and t anagrams of each other.
+     * 
+     * An anagram of a string is a string that contains the same characters with a
+     * different (or the same) ordering.
+     * 
+     * Link:
+     * https://leetcode.com/problems/minimum-number-of-steps-to-make-two-strings-anagram-ii/description/
+     * 
+     * @param s
+     * @param t
+     * @return int
+     */
+    public int secondMinSteps(String s, String t) {
+        HashMap<Character, Integer> tCounts = new HashMap<>();
+        HashMap<Character, Integer> sCounts = new HashMap<>();
+        for (int i = 0; i < t.length(); i++) {
+            char c = t.charAt(i);
+            if (tCounts.containsKey(c))
+                tCounts.put(c, tCounts.get(c) + 1);
+            else
+                tCounts.put(c, 1);
+        }
+        for (int j = 0; j < s.length(); j++) {
+            char c = s.charAt(j);
+            if (sCounts.containsKey(c))
+                sCounts.put(c, sCounts.get(c) + 1);
+            else
+                sCounts.put(c, 1);
+        }
+
+        int moves = 0;
+        for (char c : sCounts.keySet()) {
+            if (tCounts.containsKey(c)) {
+                moves += Math.abs(sCounts.get(c) - tCounts.get(c));
+            } else if (!tCounts.containsKey(c)) {
+                moves += sCounts.get(c);
+            }
+        }
+        for (char c : tCounts.keySet()) {
+            if (!sCounts.containsKey(c)) {
+                moves += tCounts.get(c);
+            }
+        }
+
+        return moves;
     }
 
 }
