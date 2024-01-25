@@ -15,9 +15,9 @@ import java.util.stream.IntStream;
 public class Solution {
 
     public static void main(String[] args) {
-        int[] jobDifficulty = new int[] { 1, 1, 1 };
-        int days = 3;
-        int v = new Solution().minDifficulty(jobDifficulty, days);
+        String[] words = new String[]{"aa","bb"};
+        List<String> wordList = Arrays.stream(words).collect(Collectors.toList());
+        int v = new Solution().maxLength(wordList);
         System.out.println(v);
     }
 
@@ -1773,7 +1773,23 @@ public class Solution {
     public int numberOfArithmeticSlices(int[] nums) {
         int numSequences = 0;
 
-        // TODO - finish this problem
+        HashMap<Integer, Integer> differences = new HashMap<>();
+
+        // Count up the differences by their frequencies
+        for (int i = 0; i < nums.length - 2; i++) {
+            for (int j = i + 1; j < nums.length; j++) {
+
+            }
+        }
+
+        // Now we can calculate the total number of sequences
+        for (int difference : differences.keySet()) {
+            if (differences.get(difference) >= 3) {
+                // Then we do have at least one arithmetic sequence with either this as the
+                // difference, or 0 as a difference
+
+            }
+        }
 
         return numSequences;
     }
@@ -1990,17 +2006,17 @@ public class Solution {
     public int minSteps(String s, String t) {
         HashMap<Character, Integer> targetCounts = new HashMap<>();
         HashMap<Character, Integer> currentCounts = new HashMap<>();
-        for (int i=0; i<t.length(); i++) {
+        for (int i = 0; i < t.length(); i++) {
             char c = t.charAt(i);
             if (targetCounts.containsKey(c))
-                targetCounts.put(c, targetCounts.get(c)+1);
+                targetCounts.put(c, targetCounts.get(c) + 1);
             else
                 targetCounts.put(c, 1);
         }
-        for (int j=0; j<s.length(); j++) {
+        for (int j = 0; j < s.length(); j++) {
             char c = s.charAt(j);
             if (currentCounts.containsKey(c))
-                currentCounts.put(c, currentCounts.get(c)+1);
+                currentCounts.put(c, currentCounts.get(c) + 1);
             else
                 currentCounts.put(c, 1);
         }
@@ -2066,6 +2082,113 @@ public class Solution {
         }
 
         return moves;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * You are given an array of strings arr. A string s is formed by the
+     * concatenation of a subsequence of arr that has unique characters.
+     * 
+     * Return the maximum possible length of s.
+     * 
+     * A subsequence is an array that can be derived from another array by deleting
+     * some or no elements without changing the order of the remaining elements.
+     * 
+     * Link:
+     * https://leetcode.com/problems/maximum-length-of-a-concatenated-string-with-unique-characters/description/?envType=daily-question&envId=2024-01-23
+     * 
+     * @param arr
+     * @return int
+     */
+    public int maxLength(List<String> arr) {
+        // Ultimately, we have to brute force this...
+        List<String> arrNoRepeatCharacterWords = arr.stream()
+                                                .filter(s -> uniqueCharacters(s))
+                                                .toList();
+        if (arrNoRepeatCharacterWords.size() == 0)
+            return 0;
+        int recordLength = 0;
+        List<List<Integer>> combinations = findCombinations(0,arrNoRepeatCharacterWords.size()-1);
+        for (List<Integer> combo : combinations) {
+            HashSet<Character> used = new HashSet<>();
+            int length = 0;
+            for (int i : combo) {
+                String word = arrNoRepeatCharacterWords.get(i);
+                boolean okay = true;
+                for (int j=0; j<word.length(); j++) {
+                    char c = word.charAt(j);
+                    if (used.contains(c)) {
+                        okay = false;
+                        break;
+                    } else {
+                        used.add(c);
+                    }
+                }
+                if (okay)
+                    length += word.length();
+            }
+            recordLength = Math.max(recordLength, length);
+        }
+
+        return recordLength;
+    }
+
+    /**
+     * Helper method to determine if a string has any repeat characters in it
+     * @param s
+     * @return boolean
+     */
+    private static boolean uniqueCharacters(String s) {
+        HashSet<Character> characters = new HashSet<>();
+        for (int i=0; i<s.length(); i++) {
+            char c = s.charAt(i);
+            if (characters.contains(c))
+                return false;
+            characters.add(c);
+        }
+        return true;
+    }
+
+    /**
+     * Helper method to generate all sequential combinations of any of the integers between and including start and upTo
+     * @param start
+     * @param upTo
+     * @return
+     */
+    List<List<Integer>> findCombinations(int start, int upTo) {
+        List<List<Integer>> combinations = new ArrayList<>();
+        if (start == upTo) {
+            List<Integer> single = new ArrayList<>();
+            List<Integer> empty = new ArrayList<>();
+            single.add(start);
+            combinations.add(single);
+            combinations.add(empty);
+        } else {
+            List<List<Integer>> previous = findCombinations(start+1, upTo);
+            for (List<Integer> list : previous) {
+                List<Integer> copy1 = copy(list);
+                // Include start, or don't
+                copy1.add(0, start);
+                combinations.add(copy1);
+                combinations.add(list);
+            }
+        }
+
+        return combinations;
+    }
+
+    /**
+     * Helper method to copy a list of objects
+     * @param original
+     * @return List<Integer>
+     */
+    private static List<Integer> copy(List<Integer> original) {
+        List<Integer> copy = new ArrayList<>();
+        for (int i : original)
+            copy.add(i);
+        return copy;
     }
 
 }
