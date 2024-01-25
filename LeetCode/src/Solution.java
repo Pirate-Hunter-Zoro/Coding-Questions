@@ -2191,4 +2191,63 @@ public class Solution {
         return copy;
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * 
+     * @param s
+     * @return int
+     */
+    public int longestPalindromeSubseq(String s) {
+        int[][] sols = new int[s.length()][s.length()];
+
+        for (int i=0; i<sols.length; i++){
+            sols[i][i] = 1;
+        }
+        for (int i=0; i<sols.length-1; i++){
+            int start = i;
+            int end = i+1;
+            sols[start][end] = (s.charAt(start)==s.charAt(end)) ? 2 : 1;
+        }
+        for (int length=2; length < s.length(); length++) {
+            for (int start=0; start < s.length()-length; start++) {
+                int end = start+length;
+                if (s.charAt(start) == s.charAt(end)) {
+                    sols[start][end] = Math.max(sols[start+1][end-1] + 2, Math.max(sols[start][end-1], sols[start+1][end]));
+                } else {
+                    sols[start][end] = Math.max(sols[start][end-1], sols[start+1][end]);
+                }
+            }
+        }
+
+        return sols[0][s.length()-1];
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Given a string s, return the number of different non-empty palindromic
+     * subsequences in s. Since the answer may be very large, return it modulo 109 +
+     * 7.
+     * 
+     * A subsequence of a string is obtained by deleting zero or more characters
+     * from the string.
+     * 
+     * A sequence is palindromic if it is equal to the sequence reversed.
+     * 
+     * Two sequences a1, a2, ... and b1, b2, ... are different if there is some i
+     * for which ai != bi.
+     * 
+     * Link:
+     * https://leetcode.com/problems/count-different-palindromic-subsequences/description/
+     * 
+     * @param s
+     * @return int
+     */
+    public int countPalindromicSubsequences(String s) {
+        return 0;
+    }
+
 }
