@@ -2247,7 +2247,35 @@ public class Solution {
      * @return int
      */
     public int countPalindromicSubsequences(String s) {
-        return 0;
+
+        long[][] sols = new long[s.length()][s.length()];
+
+        // First the base cases
+        for (int i=0; i<s.length(); i++) {
+            sols[i][i] = 1l;
+        }
+        for (int i=0; i<s.length()-1; i++) {
+            if (s.charAt(i) == s.charAt(i+1))
+                sols[i][i+1] = 3l;
+            else
+                sols[i][i+1] = 2l; 
+        }
+
+        // Now iterate through the rest of the array
+        for (int length = 2; length<s.length(); length++) {
+            for (int start = 0; start < s.length()-length; start++) {
+                int end = start+length;
+                long val = modularAdd(sols[start][end-1], sols[start+1][end]);
+                val = modularSubtract(val, sols[start+1][end-1]);
+                if (s.charAt(start) == s.charAt(end)) {
+                    long newPalindromes = sols[start+1][end-1];
+                    val = modularAdd(val, newPalindromes);
+                }
+                sols[start][end] = val;
+            }
+        }
+
+        return (int)sols[0][sols.length-1];
     }
 
 }
