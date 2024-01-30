@@ -2262,20 +2262,40 @@ public class Solution {
         }
 
         // Now iterate through the rest of the array
-        for (int length = 2; length<s.length(); length++) {
-            for (int start = 0; start < s.length()-length; start++) {
-                int end = start+length;
-                long val = modularAdd(sols[start][end-1], sols[start+1][end]);
-                val = modularSubtract(val, sols[start+1][end-1]);
-                if (s.charAt(start) == s.charAt(end)) {
-                    long newPalindromes = sols[start+1][end-1];
-                    val = modularAdd(val, newPalindromes);
-                }
-                sols[start][end] = val;
-            }
-        }
+        // TODO - figure out how!
 
         return (int)sols[0][sols.length-1];
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * You are given an array of strings tokens that represents an arithmetic
+     * expression in a Reverse Polish Notation.
+     * 
+     * Evaluate the expression. Return an integer that represents the value of the
+     * expression.
+     * 
+     * Note that:
+     * 
+     * The valid operators are '+', '-', '*', and '/'.
+     * Each operand may be an integer or another expression.
+     * The division between two integers always truncates toward zero.
+     * There will not be any division by zero.
+     * The input represents a valid arithmetic expression in a reverse polish
+     * notation.
+     * The answer and all the intermediate calculations can be represented in a
+     * 32-bit integer.
+     * 
+     * Link:
+     * https://leetcode.com/problems/evaluate-reverse-polish-notation/description/?envType=daily-question&envId=2024-01-30
+     * 
+     * @param tokens
+     * @return int
+     */
+    public int evalRPN(String[] tokens) {
+        return 0;
     }
 
 }
