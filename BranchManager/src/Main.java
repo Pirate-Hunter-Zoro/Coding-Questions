@@ -55,18 +55,12 @@ public class Main {
         // Identify this node
         private int id;
         private Node parent;
-        private TreeSet<Node> children = new TreeSet<>();
+        private ArrayList<Node> children = new ArrayList<>();
 
         // The following flags are to enable faster path searching
-        private boolean collapsed;
         private boolean closed;
         private boolean reachable;
-
-        // When we collapse the graph, we can go from a deep node up a long stretch of
-        // single parents.
-        // But once we reach a non-single parent, we need to know which Node needs to be
-        // picked at an intersection to go on the path that includes THIS node.
-        private Node checkThisNodeForClosing;
+        private int lowestOpenChild;
 
         // Keep track of which Nodes have been created
         private static HashMap<Integer, Node> nodeMap = new HashMap<>();
@@ -81,7 +75,6 @@ public class Main {
         public static void refresh() {
             nodeMap.clear();
             graphComplete = false;
-            treeCollapsed = false;
         }
 
         /**
@@ -89,7 +82,9 @@ public class Main {
          */
         public static void stateGraphComplete() {
             assert (nodeMap.size() > 0);
-            collapseAll();
+            graphComplete = true;
+            for (Node node : nodeMap.values())
+                node.children.sort((n1, n2) -> n1.compareTo(n2));
         }
 
         /**
@@ -106,6 +101,7 @@ public class Main {
             Node childNode = nodeMap.get(child);
             parentNode.children.add(childNode);
             childNode.parent = parentNode;
+            parentNode.lowestOpenChild = 0;
         }
 
         /**
@@ -115,47 +111,51 @@ public class Main {
          * @return
          */
         public static boolean reach(int id) {
-            assert (treeCollapsed);
             assert (nodeMap.containsKey(id));
+            assert (graphComplete);
             Node toReach = nodeMap.get(id);
             if (toReach.closed)
                 return false;
             else if (toReach.reachable)
                 return true;
-
-            // One way or another, we will be reaching this Node
-            toReach.setReachable();
  
-            // See if we need to close any roads
-            while (toReach != null) {
-                Node compareWithSiblings = toReach.checkThisNodeForClosing;
-                if (compareWithSiblings.parent != null) {
-                    TreeSet<Node> siblings = compareWithSiblings.parent.children;
-
-                    Node highestIDSibling = siblings.last();
-                    // Keep all children with IDs greater than or equal to compareWithSiblings's ID
-                    // (inclusive bounds)
-                    TreeSet<Node> keep = (TreeSet<Node>) siblings.subSet(compareWithSiblings, true, highestIDSibling, true);
-
-                    Node lowestIDSibling = siblings.first();
-                    if (lowestIDSibling != compareWithSiblings) {
-                        // Then we have some nodes to close - do NOT include compareWithSiblings in the
-                        // nodes we close
-                        TreeSet<Node> toClose = (TreeSet<Node>) siblings.subSet(lowestIDSibling, true, compareWithSiblings,
-                                false);
-                        for (Node nodeToClose : toClose)
-                            nodeToClose.close();
+            // Progress up to the highest node which is known to be reachable (up to the root), closing roads as we need to
+            Node current = toReach;
+            while (current != null && !current.reachable) {
+                current.reachable = true;
+                if (current.parent != null && current.parent.children.size() > 1) {
+                    int oldLowestIndex = current.parent.lowestOpenChild;
+                    current.parent.setNewIndex(current.id);
+                    for (int i=oldLowestIndex; i<current.parent.lowestOpenChild; i++) {
+                        current.parent.children.get(i).close();
                     }
-
-                    // Simply discard all other siblings - we will never need to check them again
-                    compareWithSiblings.parent.children = keep;
                 }
 
                 // Now we need to repeat on this.checkThisNodeForClosing's parent (if the parent is null the loop will end)
-                toReach = toReach.checkThisNodeForClosing.parent;
+                current = current.parent;
             }
 
             return true;
+        }
+
+        /**
+         * Modify the Node's lowestOpenChild index to be whatever is needed to make the inputted ID the lowest valid index
+         * @param lowestValidID
+         */
+        private void setNewIndex(int lowestValidID) {
+            int left = this.lowestOpenChild; // inclusive
+            int right = this.children.size(); // exclusive
+            while (left < right) {
+                int mid = (left + right) / 2;
+                if (this.children.get(mid).id == lowestValidID) {
+                    this.lowestOpenChild = mid;
+                    break;
+                } else if (this.children.get(mid).id < lowestValidID) {
+                    left = mid;
+                } else {
+                    right = mid;
+                }
+            }
         }
 
         /**
@@ -177,71 +177,7 @@ public class Main {
          */
         private Node(int id) {
             this.id = id;
-            this.checkThisNodeForClosing = this; // by default
-        }
-
-        // Keep track of whether we have collapsed the graph
-        private static boolean treeCollapsed;
-
-        /**
-         * Method to iterate through all of the leaf Nodes and and collapse them up
-         */
-        private static void collapseAll() {
-            assert (graphComplete);
-            for (Node node : nodeMap.values()) {
-                if (node.children.size() == 0)
-                    node.collapse();
-            }
-            treeCollapsed = true;
-        }
-
-        /**
-         * This method may do nothing, but suppose one node is connected to a parent
-         * with no other children, and THAT parent is connected to a grandparent with no
-         * other children.
-         * Then the algorithm for picking a path with the lowest index at a fork in the
-         * road only has one choice - there's no need to take the time to make it.
-         */
-        private void collapse() {
-            if (this.collapsed)
-                return;
-
-            // Otherwise, can we change this.checkThisNodeForClosing to farther up the tree?
-            Node current = this.parent;
-            while (current != null) {
-                if (current.children.size() > 1)
-                    break;
-                this.checkThisNodeForClosing = current;
-                current = current.parent;
-            }
-            // Now we progress up the tree to this.checkThisNodeForClosing
-            if (this.checkThisNodeForClosing != this) {
-                current = this.parent;
-                while (current != null && current != this.checkThisNodeForClosing) {
-                    current.checkThisNodeForClosing = this.checkThisNodeForClosing;
-                    current = current.parent;
-                }
-                if (this.checkThisNodeForClosing.parent != null) 
-                    this.checkThisNodeForClosing.parent.collapse();
-            } else { // We had siblings
-                if (this.parent != null)
-                    this.parent.collapse();
-            }
-            this.collapsed = true;
-        }
-
-        /**
-         * Mark this node as reachable if it has not already been maked as reachable
-         */
-        private void setReachable() {
-            if (!this.reachable) {
-                this.reachable = true;
-                Node current = this.parent;
-                while (current != null && !current.reachable) {
-                    current.reachable = true;
-                    current = current.parent;
-                }
-            }
+            this.lowestOpenChild = -1;
         }
 
         /**
