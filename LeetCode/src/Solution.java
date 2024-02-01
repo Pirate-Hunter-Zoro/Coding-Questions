@@ -1,14 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.PriorityQueue;
-import java.util.Stack;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -1748,56 +1738,6 @@ public class Solution {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Given an integer array nums, return the number of all the arithmetic
-     * subsequences of nums.
-     * 
-     * A sequence of numbers is called arithmetic if it consists of at least three
-     * elements and if the difference between any two consecutive elements is the
-     * same.
-     * 
-     * For example, [1, 3, 5, 7, 9], [7, 7, 7, 7], and [3, -1, -5, -9] are
-     * arithmetic sequences.
-     * For example, [1, 1, 2, 5, 7] is not an arithmetic sequence.
-     * A subsequence of an array is a sequence that can be formed by removing some
-     * elements (possibly none) of the array.
-     * 
-     * For example, [2,5,10] is a subsequence of [1,2,1,2,4,1,5,10].
-     * The test cases are generated so that the answer fits in 32-bit integer.
-     * 
-     * Link:
-     * https://leetcode.com/problems/arithmetic-slices-ii-subsequence/?envType=daily-question&envId=2024-01-08
-     * 
-     * @param nums
-     * @return int
-     */
-    public int numberOfArithmeticSlices(int[] nums) {
-        int numSequences = 0;
-
-        HashMap<Integer, Integer> differences = new HashMap<>();
-
-        // Count up the differences by their frequencies
-        for (int i = 0; i < nums.length - 2; i++) {
-            for (int j = i + 1; j < nums.length; j++) {
-
-            }
-        }
-
-        // Now we can calculate the total number of sequences
-        for (int difference : differences.keySet()) {
-            if (differences.get(difference) >= 3) {
-                // Then we do have at least one arithmetic sequence with either this as the
-                // difference, or 0 as a difference
-
-            }
-        }
-
-        return numSequences;
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
      * Given the root of a binary tree, return the bottom-up level order traversal
      * of its nodes' values. (i.e., from left to right, level by level from leaf to
      * root).
@@ -2228,49 +2168,6 @@ public class Solution {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Given a string s, return the number of different non-empty palindromic
-     * subsequences in s. Since the answer may be very large, return it modulo 109 +
-     * 7.
-     * 
-     * A subsequence of a string is obtained by deleting zero or more characters
-     * from the string.
-     * 
-     * A sequence is palindromic if it is equal to the sequence reversed.
-     * 
-     * Two sequences a1, a2, ... and b1, b2, ... are different if there is some i
-     * for which ai != bi.
-     * 
-     * Link:
-     * https://leetcode.com/problems/count-different-palindromic-subsequences/description/
-     * 
-     * @param s
-     * @return int
-     */
-    public int countPalindromicSubsequences(String s) {
-
-        long[][] sols = new long[s.length()][s.length()];
-
-        // First the base cases
-        for (int i=0; i<s.length(); i++) {
-            sols[i][i] = 1l;
-        }
-        for (int i=0; i<s.length()-1; i++) {
-            if (s.charAt(i) == s.charAt(i+1))
-                sols[i][i+1] = 3l;
-            else
-                sols[i][i+1] = 2l; 
-        }
-
-        // Now iterate through the rest of the array
-        // TODO - figure out how!
-
-        return (int)sols[0][sols.length-1];
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
      * You are given an array of strings tokens that represents an arithmetic
      * expression in a Reverse Polish Notation.
      * 
@@ -2321,6 +2218,99 @@ public class Solution {
             }
         }
         return values.pop();
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Given a string s, return the number of different non-empty palindromic
+     * subsequences in s. Since the answer may be very large, return it modulo 109 +
+     * 7.
+     * 
+     * A subsequence of a string is obtained by deleting zero or more characters
+     * from the string.
+     * 
+     * A sequence is palindromic if it is equal to the sequence reversed.
+     * 
+     * Two sequences a1, a2, ... and b1, b2, ... are different if there is some i
+     * for which ai != bi.
+     * 
+     * Link:
+     * https://leetcode.com/problems/count-different-palindromic-subsequences/description/
+     * 
+     * @param s
+     * @return int
+     */
+    public int countPalindromicSubsequences(String s) {
+
+        long[][] sols = new long[s.length()][s.length()];
+
+        // First the base cases
+        for (int i=0; i<s.length(); i++) {
+            sols[i][i] = 1l;
+        }
+        for (int i=0; i<s.length()-1; i++) {
+            if (s.charAt(i) == s.charAt(i+1))
+                sols[i][i+1] = 3l;
+            else
+                sols[i][i+1] = 2l; 
+        }
+
+        // Now iterate through the rest of the array
+        // TODO - figure out how!
+
+        return (int)sols[0][sols.length-1];
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Given an integer array nums, return the number of all the arithmetic
+     * subsequences of nums.
+     * 
+     * A sequence of numbers is called arithmetic if it consists of at least three
+     * elements and if the difference between any two consecutive elements is the
+     * same.
+     * 
+     * For example, [1, 3, 5, 7, 9], [7, 7, 7, 7], and [3, -1, -5, -9] are
+     * arithmetic sequences.
+     * For example, [1, 1, 2, 5, 7] is not an arithmetic sequence.
+     * A subsequence of an array is a sequence that can be formed by removing some
+     * elements (possibly none) of the array.
+     * 
+     * For example, [2,5,10] is a subsequence of [1,2,1,2,4,1,5,10].
+     * The test cases are generated so that the answer fits in 32-bit integer.
+     * 
+     * Link:
+     * https://leetcode.com/problems/arithmetic-slices-ii-subsequence/?envType=daily-question&envId=2024-01-08
+     * 
+     * @param nums
+     * @return int
+     */
+    public int numberOfArithmeticSlices(int[] nums) {
+        int numSequences = 0;
+
+        HashMap<Integer, Integer> differences = new HashMap<>();
+
+        // Count up the differences by their frequencies
+        for (int i = 0; i < nums.length - 2; i++) {
+            for (int j = i + 1; j < nums.length; j++) {
+
+            }
+        }
+
+        // Now we can calculate the total number of sequences
+        for (int difference : differences.keySet()) {
+            if (differences.get(difference) >= 3) {
+                // Then we do have at least one arithmetic sequence with either this as the
+                // difference, or 0 as a difference
+
+            }
+        }
+
+        return numSequences;
     }
 
 }
