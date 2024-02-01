@@ -2295,7 +2295,32 @@ public class Solution {
      * @return int
      */
     public int evalRPN(String[] tokens) {
-        return 0;
+        Stack<Integer> values = new Stack<>();
+        HashSet<String> operations = new HashSet<>();
+        operations.add("*");
+        operations.add("+");
+        operations.add("-");
+        operations.add("/");
+        for (String s : tokens) {
+            if (operations.contains(s)) {
+                int second = values.pop();
+                int first = values.pop();
+                int result = 0;
+                if (s.equals("*")) {
+                    result = first * second;
+                } else if (s.equals("+")) {
+                    result = first + second;
+                } else if (s.equals("-")) {
+                    result = first - second;
+                } else {
+                    result = first / second;
+                }
+                values.push(result);
+            } else {
+                values.push(Integer.parseInt(s));
+            }
+        }
+        return values.pop();
     }
 
 }
