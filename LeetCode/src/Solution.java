@@ -4,13 +4,6 @@ import java.util.stream.IntStream;
 
 public class Solution {
 
-    public static void main(String[] args) {
-        String[] words = new String[]{"aa","bb"};
-        List<String> wordList = Arrays.stream(words).collect(Collectors.toList());
-        int v = new Solution().maxLength(wordList);
-        System.out.println(v);
-    }
-
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2045,19 +2038,19 @@ public class Solution {
     public int maxLength(List<String> arr) {
         // Ultimately, we have to brute force this...
         List<String> arrNoRepeatCharacterWords = arr.stream()
-                                                .filter(s -> uniqueCharacters(s))
-                                                .toList();
+                .filter(s -> uniqueCharacters(s))
+                .toList();
         if (arrNoRepeatCharacterWords.size() == 0)
             return 0;
         int recordLength = 0;
-        List<List<Integer>> combinations = findCombinations(0,arrNoRepeatCharacterWords.size()-1);
+        List<List<Integer>> combinations = findCombinations(0, arrNoRepeatCharacterWords.size() - 1);
         for (List<Integer> combo : combinations) {
             HashSet<Character> used = new HashSet<>();
             int length = 0;
             for (int i : combo) {
                 String word = arrNoRepeatCharacterWords.get(i);
                 boolean okay = true;
-                for (int j=0; j<word.length(); j++) {
+                for (int j = 0; j < word.length(); j++) {
                     char c = word.charAt(j);
                     if (used.contains(c)) {
                         okay = false;
@@ -2077,12 +2070,13 @@ public class Solution {
 
     /**
      * Helper method to determine if a string has any repeat characters in it
+     * 
      * @param s
      * @return boolean
      */
     private static boolean uniqueCharacters(String s) {
         HashSet<Character> characters = new HashSet<>();
-        for (int i=0; i<s.length(); i++) {
+        for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (characters.contains(c))
                 return false;
@@ -2092,7 +2086,9 @@ public class Solution {
     }
 
     /**
-     * Helper method to generate all sequential combinations of any of the integers between and including start and upTo
+     * Helper method to generate all sequential combinations of any of the integers
+     * between and including start and upTo
+     * 
      * @param start
      * @param upTo
      * @return
@@ -2106,7 +2102,7 @@ public class Solution {
             combinations.add(single);
             combinations.add(empty);
         } else {
-            List<List<Integer>> previous = findCombinations(start+1, upTo);
+            List<List<Integer>> previous = findCombinations(start + 1, upTo);
             for (List<Integer> list : previous) {
                 List<Integer> copy1 = copy(list);
                 // Include start, or don't
@@ -2121,6 +2117,7 @@ public class Solution {
 
     /**
      * Helper method to copy a list of objects
+     * 
      * @param original
      * @return List<Integer>
      */
@@ -2142,26 +2139,27 @@ public class Solution {
     public int longestPalindromeSubseq(String s) {
         int[][] sols = new int[s.length()][s.length()];
 
-        for (int i=0; i<sols.length; i++){
+        for (int i = 0; i < sols.length; i++) {
             sols[i][i] = 1;
         }
-        for (int i=0; i<sols.length-1; i++){
+        for (int i = 0; i < sols.length - 1; i++) {
             int start = i;
-            int end = i+1;
-            sols[start][end] = (s.charAt(start)==s.charAt(end)) ? 2 : 1;
+            int end = i + 1;
+            sols[start][end] = (s.charAt(start) == s.charAt(end)) ? 2 : 1;
         }
-        for (int length=2; length < s.length(); length++) {
-            for (int start=0; start < s.length()-length; start++) {
-                int end = start+length;
+        for (int length = 2; length < s.length(); length++) {
+            for (int start = 0; start < s.length() - length; start++) {
+                int end = start + length;
                 if (s.charAt(start) == s.charAt(end)) {
-                    sols[start][end] = Math.max(sols[start+1][end-1] + 2, Math.max(sols[start][end-1], sols[start+1][end]));
+                    sols[start][end] = Math.max(sols[start + 1][end - 1] + 2,
+                            Math.max(sols[start][end - 1], sols[start + 1][end]));
                 } else {
-                    sols[start][end] = Math.max(sols[start][end-1], sols[start+1][end]);
+                    sols[start][end] = Math.max(sols[start][end - 1], sols[start + 1][end]);
                 }
             }
         }
 
-        return sols[0][s.length()-1];
+        return sols[0][s.length() - 1];
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2247,20 +2245,20 @@ public class Solution {
         long[][] sols = new long[s.length()][s.length()];
 
         // First the base cases
-        for (int i=0; i<s.length(); i++) {
+        for (int i = 0; i < s.length(); i++) {
             sols[i][i] = 1l;
         }
-        for (int i=0; i<s.length()-1; i++) {
-            if (s.charAt(i) == s.charAt(i+1))
-                sols[i][i+1] = 3l;
+        for (int i = 0; i < s.length() - 1; i++) {
+            if (s.charAt(i) == s.charAt(i + 1))
+                sols[i][i + 1] = 3l;
             else
-                sols[i][i+1] = 2l; 
+                sols[i][i + 1] = 2l;
         }
 
         // Now iterate through the rest of the array
         // TODO - figure out how!
 
-        return (int)sols[0][sols.length-1];
+        return (int) sols[0][sols.length - 1];
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2311,6 +2309,135 @@ public class Solution {
         }
 
         return numSequences;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Given two strings s and t of lengths m and n respectively, return the minimum
+     * window
+     * substring
+     * of s such that every character in t (including duplicates) is included in the
+     * window. If there is no such substring, return the empty string "".
+     * 
+     * The testcases will be generated such that the answer is unique.
+     * 
+     * Link:
+     * https://leetcode.com/problems/minimum-window-substring/description/?envType=daily-question&envId=2024-02-04
+     * 
+     * @param s
+     * @param t
+     * @return String
+     */
+    public String minWindow(String s, String t) {
+        HashMap<Character, Integer> targetCounts = new HashMap<>();
+        HashMap<Character, Integer> currentCounts = new HashMap<>();
+
+        // Establish the target count
+        int charsNeeded = t.length();
+        for (int i = 0; i < t.length(); i++) {
+            char c = t.charAt(i);
+            if (targetCounts.containsKey(c))
+                targetCounts.put(c, targetCounts.get(c) + 1);
+            else
+                targetCounts.put(c, 1);
+
+            if (!currentCounts.containsKey(c))
+                currentCounts.put(c, 0);
+        }
+
+        // Progress outward until we achieve the counts of everything we need
+        int start = 0;
+        int end = 0;
+        int charsMatched = 0;
+        while (charsMatched < charsNeeded) {
+            char c = s.charAt(end);
+            if (targetCounts.containsKey(c) && targetCounts.get(c) > currentCounts.get(c)) {
+                charsMatched++;
+            }
+            if (targetCounts.containsKey(c))
+                currentCounts.put(c, currentCounts.get(c) + 1);
+            if (charsMatched < charsNeeded)
+                end++;
+
+            if (end >= s.length())
+                return "";
+        }
+
+        // Move up 'start' as long as it is not providing any useful characters
+        while (!currentCounts.containsKey(s.charAt(start))
+                || currentCounts.get(s.charAt(start)) > targetCounts.get(s.charAt(start))) {
+            char c = s.charAt(start);
+            if (currentCounts.containsKey(c))
+                currentCounts.put(c, currentCounts.get(c) - 1);
+            start++;
+        }
+
+        // Now for sliding window
+        int bestStart = start;
+        int bestEnd = end;
+        // What we do know is that we will slide start along with end, because if we
+        // begin at start, we will only achieve a greater length than already achieved
+        while (end < s.length() - 1) {
+            char oldStart = s.charAt(start);
+            // We know that this was a useful character, or it wouldn't have been a start
+            currentCounts.put(oldStart, currentCounts.get(oldStart) - 1);
+            charsMatched--;
+
+            start++; // Move the start to someplace useful
+            while (!currentCounts.containsKey(s.charAt(start))
+                    || currentCounts.get(s.charAt(start)) > targetCounts.get(s.charAt(start))) {
+                char c = s.charAt(start);
+                if (currentCounts.containsKey(c))
+                    currentCounts.put(c, currentCounts.get(c) - 1);
+                start++;
+                if (start >= s.length())
+                    break;
+            }
+
+            end++; // Move the end as far as we need to
+            while (charsMatched < charsNeeded && end < s.length()) {
+                char c = s.charAt(end);
+                if (targetCounts.containsKey(c) && targetCounts.get(c) > currentCounts.get(c)) {
+                    charsMatched++;
+                }
+                if (targetCounts.containsKey(c))
+                    currentCounts.put(c, currentCounts.get(c) + 1);
+                if (charsMatched < charsNeeded)
+                    end++;
+            }
+
+            if (charsMatched == charsNeeded) {
+                // Move the start to someplace useful in case moving the end picked up extras
+                while (!currentCounts.containsKey(s.charAt(start))
+                        || currentCounts.get(s.charAt(start)) > targetCounts.get(s.charAt(start))) {
+                    char c = s.charAt(start);
+                    if (currentCounts.containsKey(c))
+                        currentCounts.put(c, currentCounts.get(c) - 1);
+                    start++;
+                }
+                int length = end - start + 1;
+                int recordLength = bestEnd - bestStart + 1;
+                if (length < recordLength) {
+                    bestEnd = end;
+                    bestStart = start;
+                }
+            }
+
+        }
+
+        return s.substring(bestStart, bestEnd + 1);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static void main(String[] args) {
+        String s = "ac";
+        String t = "a";
+        String match = new Solution().minWindow(s, t);
+        System.out.println(match);
     }
 
 }
