@@ -2433,11 +2433,45 @@ public class Solution {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Given an m x n integers matrix, return the length of the longest increasing
+     * path in matrix.
+     * 
+     * From each cell, you can either move in four directions: left, right, up, or
+     * down. You may not move diagonally or move outside the boundary (i.e.,
+     * wrap-around is not allowed).
+     * 
+     * Link:
+     * https://leetcode.com/problems/longest-increasing-path-in-a-matrix/description/
+     * 
+     * @param matrix
+     * @return int
+     */
+    public int longestIncreasingPath(int[][] matrix) {
+        // The longest possible length the path could be is m*n, the total number of
+        // cells
+        // That's how many sub-problems we have
+        int[][][] sols = new int[matrix.length * matrix[0].length][matrix.length][matrix[0].length];
+        // 1 <= m,n <= 200, so this is at most 200^4 = 16 x 10^8 < 10^10, so we should be safe
+
+        // Base case
+        for (int i=0; i<matrix.length; i++) {
+            for (int j=0; j<matrix.length; j++) {
+                sols[0][i][j] = 1;
+            }
+        }
+
+        // Work our way up with dynamic programming - cells with value 0 correspond to NO path of the corresponding length being possible
+        int maxPathLength = 1;
+
+        return maxPathLength;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public static void main(String[] args) {
-        String s = "ac";
-        String t = "a";
-        String match = new Solution().minWindow(s, t);
-        System.out.println(match);
+        int[][] matrix = new int[][] { { 9, 9, 4 }, { 6, 6, 8 }, { 2, 1, 1 } };
     }
 
 }
