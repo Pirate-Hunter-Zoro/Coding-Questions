@@ -2315,6 +2315,49 @@ public class Solution {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
+     * Given an integer n, return the least number of perfect square numbers that
+     * sum to n.
+     * 
+     * A perfect square is an integer that is the square of an integer; in other
+     * words, it is the product of some integer with itself. For example, 1, 4, 9,
+     * and 16 are perfect squares while 3 and 11 are not.
+     * 
+     * Link:
+     * https://leetcode.com/problems/perfect-squares/description/?envType=daily-question&envId=2024-02-08
+     * 
+     * @param n
+     * @return int
+     */
+    public int numSquares(int n) {
+        int[] sols = new int[n];
+        sols[0] = 1;
+        return topDownNumSquares(n, sols);
+    }
+
+    /**
+     * Recursive helper method to solve the preceding problem
+     * @param n
+     * @param sols
+     */
+    private int topDownNumSquares(int n, int[] sols) {
+        if (n==0)
+            return 0;
+        else if (sols[n-1] != 0)
+            return sols[n-1];
+        // otherwise, we need to solve this number
+        int best = Integer.MAX_VALUE;
+        for (int i=1; i<=Math.sqrt(n); i++) {
+            int square = i * i;
+            best = Math.min(best, 1 + topDownNumSquares(n-square, sols));
+        }
+        sols[n-1] = best;
+        return best;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
      * Given two strings s and t of lengths m and n respectively, return the minimum
      * window
      * substring
@@ -2452,16 +2495,18 @@ public class Solution {
         // cells
         // That's how many sub-problems we have
         int[][][] sols = new int[matrix.length * matrix[0].length][matrix.length][matrix[0].length];
-        // 1 <= m,n <= 200, so this is at most 200^4 = 16 x 10^8 < 10^10, so we should be safe
+        // 1 <= m,n <= 200, so this is at most 200^4 = 16 x 10^8 < 10^10, so we should
+        // be safe
 
         // Base case
-        for (int i=0; i<matrix.length; i++) {
-            for (int j=0; j<matrix.length; j++) {
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix.length; j++) {
                 sols[0][i][j] = 1;
             }
         }
 
-        // Work our way up with dynamic programming - cells with value 0 correspond to NO path of the corresponding length being possible
+        // Work our way up with dynamic programming - cells with value 0 correspond to
+        // NO path of the corresponding length being possible
         int maxPathLength = 1;
 
         return maxPathLength;
