@@ -2336,21 +2336,22 @@ public class Solution {
 
     /**
      * Recursive helper method to solve the preceding problem
+     * 
      * @param n
      * @param sols
      */
     private int topDownNumSquares(int n, int[] sols) {
-        if (n==0)
+        if (n == 0)
             return 0;
-        else if (sols[n-1] != 0)
-            return sols[n-1];
+        else if (sols[n - 1] != 0)
+            return sols[n - 1];
         // otherwise, we need to solve this number
         int best = Integer.MAX_VALUE;
-        for (int i=1; i<=Math.sqrt(n); i++) {
+        for (int i = 1; i <= Math.sqrt(n); i++) {
             int square = i * i;
-            best = Math.min(best, 1 + topDownNumSquares(n-square, sols));
+            best = Math.min(best, 1 + topDownNumSquares(n - square, sols));
         }
-        sols[n-1] = best;
+        sols[n - 1] = best;
         return best;
     }
 
@@ -2491,25 +2492,65 @@ public class Solution {
      * @return int
      */
     public int longestIncreasingPath(int[][] matrix) {
-        // The longest possible length the path could be is m*n, the total number of
-        // cells
-        // That's how many sub-problems we have
-        int[][][] sols = new int[matrix.length * matrix[0].length][matrix.length][matrix[0].length];
-        // 1 <= m,n <= 200, so this is at most 200^4 = 16 x 10^8 < 10^10, so we should
-        // be safe
-
-        // Base case
+        List<Coordinate> sortedCoordinates = new ArrayList<>();
         for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix.length; j++) {
-                sols[0][i][j] = 1;
+            for (int j = 0; j < matrix[i].length; j++) {
+                Coordinate coordinate = new Coordinate(matrix[i][j], i, j);
+                sortedCoordinates.add(coordinate);
             }
         }
+        sortedCoordinates.sort(Coordinate::compareTo);
 
-        // Work our way up with dynamic programming - cells with value 0 correspond to
-        // NO path of the corresponding length being possible
-        int maxPathLength = 1;
+        int[][] dp = new int[matrix.length][matrix[0].length];
+        int max = Integer.MIN_VALUE;
+        for (Coordinate coord : sortedCoordinates) {
+            int r = coord.row;
+            int c = coord.col;
+            int v = coord.val;
+            int prevDP = dp[r][c];
+            if (checkNeighbor(prevDP, v, r - 1, c, matrix, dp))
+                max = Math.max(max, dp[r - 1][c]);
+            if (checkNeighbor(prevDP, v, r + 1, c, matrix, dp))
+                max = Math.max(max, dp[r + 1][c]);
+            if (checkNeighbor(prevDP, v, r, c - 1, matrix, dp))
+                max = Math.max(max, dp[r][c - 1]);
+            if (checkNeighbor(prevDP, v, r, c + 1, matrix, dp))
+                max = Math.max(max, dp[r][c + 1]);
+            // Call method for up one
+            // Call method for left one
+            // Call method for down one
+            // Call method for right one
+        }
 
-        return maxPathLength;
+        return (max != Integer.MIN_VALUE) ? max + 1 : 1;
+    }
+
+    private boolean checkNeighbor(int prevDP, int v, int row, int col, int[][] matrix, int[][] dp) {
+        if (row < 0 || row >= matrix.length || col < 0 || col >= matrix[0].length)
+            return false;
+        int nextVal = matrix[row][col];
+        if (nextVal > v) {
+            int potentialRecordPath = prevDP + 1;
+            dp[row][col] = Math.max(dp[row][col], potentialRecordPath);
+        }
+        return true;
+    }
+
+    private static class Coordinate implements Comparable<Coordinate> {
+        public int val;
+        public int row;
+        public int col;
+
+        public Coordinate(int v, int r, int c) {
+            val = v;
+            row = r;
+            col = c;
+        }
+
+        @Override
+        public int compareTo(Solution.Coordinate o) {
+            return this.val - o.val;
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
