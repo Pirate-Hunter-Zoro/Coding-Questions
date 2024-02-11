@@ -2352,16 +2352,50 @@ public class Solution {
     }
 
     private static int choose(int n, int k) {
-        if (combos[n-1][k-1] == 0) {
+        if (combos[n - 1][k - 1] == 0) {
             if (n == k)
-                combos[n-1][k-1] = 1;
-            else if (k == 1 || k == n-1)
-                combos[n-1][k-1] = n;
+                combos[n - 1][k - 1] = 1;
+            else if (k == 1 || k == n - 1)
+                combos[n - 1][k - 1] = n;
             else {
-                combos[n-1][k-1] = choose(n-1, k-1) + choose(n-1, k);
+                combos[n - 1][k - 1] = choose(n - 1, k - 1) + choose(n - 1, k);
             }
         }
-        return combos[n-1][k-1];
+        return combos[n - 1][k - 1];
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * You are given a rows x cols matrix grid representing a field of cherries
+     * where grid[i][j] represents the number of cherries that you can collect from
+     * the (i, j) cell.
+     * 
+     * You have two robots that can collect cherries for you:
+     * 
+     * Robot #1 is located at the top-left corner (0, 0), and
+     * Robot #2 is located at the top-right corner (0, cols - 1).
+     * Return the maximum number of cherries collection using both robots by
+     * following the rules below:
+     * 
+     * From a cell (i, j), robots can move to cell (i + 1, j - 1), (i + 1, j), or (i
+     * + 1, j + 1).
+     * When any robot passes through a cell, It picks up all cherries, and the cell
+     * becomes an empty cell.
+     * When both robots stay in the same cell, only one takes the cherries.
+     * Both robots cannot move outside of the grid at any moment.
+     * Both robots should reach the bottom row in grid.
+     * 
+     * Link:
+     * https://leetcode.com/problems/cherry-pickup-ii/description/?envType=daily-question&envId=2024-02-11
+     * 
+     * @param grid
+     * @return int
+     */
+    public int cherryPickup(int[][] grid) {
+        // TODO
+        return 0;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2614,6 +2648,10 @@ public class Solution {
                 2147483645, 2147483646, 2147483647, -2147483648, -2147483647, -2147483646, -2147483645, -2147483644,
                 -2147483643, -2147483642, -2147483641, -2147483640, -2147483639 };
         int v = new Solution().numberOfArithmeticSlices(nums);
+        System.out.println(v);
+
+        int[][] grid = new int[][] { { 3, 1, 1 }, { 2, 5, 1 }, { 1, 5, 5 }, { 2, 1, 1 } };
+        v = new Solution().cherryPickup(grid);
         System.out.println(v);
     }
 
