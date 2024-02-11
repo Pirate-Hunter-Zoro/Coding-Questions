@@ -2288,27 +2288,80 @@ public class Solution {
      * @return int
      */
     public int numberOfArithmeticSlices(int[] nums) {
-        int numSequences = 0;
+        int[][] numSlices = new int[nums.length][nums.length];
 
-        HashMap<Integer, Integer> differences = new HashMap<>();
-
-        // Count up the differences by their frequencies
-        for (int i = 0; i < nums.length - 2; i++) {
-            for (int j = i + 1; j < nums.length; j++) {
-
+        // We only care about arithmetic subsequences of size three or greater
+        for (int jump = 2; jump <= nums.length - 1; jump++) {
+            for (int i = 0; i < nums.length - jump; i++) {
+                int start = i; // inclusive
+                int end = start + jump; // inclusive
+                // Observe the following sub-problem relation
+                // numSlices(i,j) = numSlices(i, j+1) + numSlices(i+1, j) - numSlices(i+1,j-1)
+                // + number of new subsequences that must include nums[i] AND nums[j]
+                int newSequences = 0;
+                if ((nums[end] - nums[start]) > 0) {
+                    for (int size = 3; size <= (end - start + 1); size++) { // The size of each new sequence we
+                                                                            // encounter
+                        // There is only ONE possible new sequence of the given size since we must
+                        // include nums[start] AND nums[end]
+                        if ((nums[end] - nums[start]) % (size - 1) == 0) {
+                            // There is a possible integer difference if we want an arithmetic series of the
+                            // given size
+                            // Calculate all of the new sequences we produce
+                            // TODO - that's next
+                        }
+                    }
+                } else if (nums[end] - nums[start] == 0) {
+                    // Then we search for this same value throughout the values in between
+                    int val = nums[start];
+                    int numFound = 2;
+                    for (int j = start + 1; j < end; j++) {
+                        if (nums[j] == val) {
+                            numFound++;
+                        }
+                    }
+                    newSequences += findChoiceSum(numFound);
+                }
+                // Now to record
+                numSlices[start][end] = numSlices[start + 1][end] + numSlices[start][end - 1]
+                        - numSlices[start + 1][end - 1] + newSequences;
             }
         }
 
-        // Now we can calculate the total number of sequences
-        for (int difference : differences.keySet()) {
-            if (differences.get(difference) >= 3) {
-                // Then we do have at least one arithmetic sequence with either this as the
-                // difference, or 0 as a difference
+        return numSlices[0][numSlices.length - 1];
+    }
 
+    private static HashMap<Integer, Integer> choiceSums = new HashMap<>();
+    private static int[][] combos = new int[1000][1000];
+
+    private int findChoiceSum(int v) {
+        if (choiceSums.containsKey(v))
+            return choiceSums.get(v);
+        else if (v < 3)
+            return 0;
+        else {
+            int numIndexCombos = 0;
+            for (int k = 3; k <= v; k++) {
+                // Count how many subsequences of the given length we can make when we KNOW the
+                // first and last index must be included
+                numIndexCombos += choose(v - 2, k - 2);
+            }
+            choiceSums.put(v, numIndexCombos);
+            return choiceSums.get(v);
+        }
+    }
+
+    private static int choose(int n, int k) {
+        if (combos[n-1][k-1] == 0) {
+            if (n == k)
+                combos[n-1][k-1] = 1;
+            else if (k == 1 || k == n-1)
+                combos[n-1][k-1] = n;
+            else {
+                combos[n-1][k-1] = choose(n-1, k-1) + choose(n-1, k);
             }
         }
-
-        return numSequences;
+        return combos[n-1][k-1];
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2557,7 +2610,11 @@ public class Solution {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static void main(String[] args) {
-        int[][] matrix = new int[][] { { 9, 9, 4 }, { 6, 6, 8 }, { 2, 1, 1 } };
+        int[] nums = new int[] { 2147483638, 2147483639, 2147483640, 2147483641, 2147483642, 2147483643, 2147483644,
+                2147483645, 2147483646, 2147483647, -2147483648, -2147483647, -2147483646, -2147483645, -2147483644,
+                -2147483643, -2147483642, -2147483641, -2147483640, -2147483639 };
+        int v = new Solution().numberOfArithmeticSlices(nums);
+        System.out.println(v);
     }
 
 }
