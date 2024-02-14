@@ -48,6 +48,24 @@ public class Solution {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private static int[][] combos = new int[1000][1000];
+
+    private static int choose(int n, int k) {
+        if (combos[n - 1][k - 1] == 0) {
+            if (n == k)
+                combos[n - 1][k - 1] = 1;
+            else if (k == 1 || k == n - 1)
+                combos[n - 1][k - 1] = n;
+            else {
+                combos[n - 1][k - 1] = choose(n - 1, k - 1) + choose(n - 1, k);
+            }
+        }
+        return combos[n - 1][k - 1];
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * You are given n balloons, indexed from 0 to n - 1. Each balloon is painted
      * with a number on it represented by an array nums. You are asked to burst all
@@ -2289,6 +2307,7 @@ public class Solution {
      */
     public int numberOfArithmeticSlices(int[] nums) {
         int[][] numSlices = new int[nums.length][nums.length];
+        long[] numsAsLongs = Arrays.stream(nums).mapToLong(i -> (long) i).toArray();
 
         // We only care about arithmetic subsequences of size three or greater
         for (int jump = 2; jump <= nums.length - 1; jump++) {
@@ -2299,28 +2318,22 @@ public class Solution {
                 // numSlices(i,j) = numSlices(i, j+1) + numSlices(i+1, j) - numSlices(i+1,j-1)
                 // + number of new subsequences that must include nums[i] AND nums[j]
                 int newSequences = 0;
-                if ((nums[end] - nums[start]) > 0) {
-                    for (int size = 3; size <= (end - start + 1); size++) { // The size of each new sequence we
-                                                                            // encounter
-                        // There is only ONE possible new sequence of the given size since we must
-                        // include nums[start] AND nums[end]
-                        if ((nums[end] - nums[start]) % (size - 1) == 0) {
-                            // There is a possible integer difference if we want an arithmetic series of the
-                            // given size
-                            // Calculate all of the new sequences we produce
-                            // TODO - that's next
+                for (int size = 3; size <= (end - start + 1); size++) { // The size of each new sequence we
+                                                                        // encounter
+                    // There is only ONE possible new sequence of the given size since we must
+                    // include nums[start] AND nums[end]
+                    if ((nums[end] - nums[start]) % (size - 1) == 0) {
+                        // There is a possible integer difference if we want an arithmetic series of the
+                        // given size
+                        // Count all of the new sequences we produce
+                        long arithmeticDifference = ((long) nums[end] - (long) nums[start]) / ((long) size - 1l);
+                        long[] sequence = new long[size - 2];
+                        for (long place = 0l; place < sequence.length; place++) {
+                            long d = arithmeticDifference * (place + 1);
+                            sequence[(int) place] = nums[start] + d;
                         }
+                        newSequences += countOccurrences(numsAsLongs, start + 1, end - 1, sequence);
                     }
-                } else if (nums[end] - nums[start] == 0) {
-                    // Then we search for this same value throughout the values in between
-                    int val = nums[start];
-                    int numFound = 2;
-                    for (int j = start + 1; j < end; j++) {
-                        if (nums[j] == val) {
-                            numFound++;
-                        }
-                    }
-                    newSequences += findChoiceSum(numFound);
                 }
                 // Now to record
                 numSlices[start][end] = numSlices[start + 1][end] + numSlices[start][end - 1]
@@ -2331,37 +2344,84 @@ public class Solution {
         return numSlices[0][numSlices.length - 1];
     }
 
-    private static HashMap<Integer, Integer> choiceSums = new HashMap<>();
-    private static int[][] combos = new int[1000][1000];
-
-    private int findChoiceSum(int v) {
-        if (choiceSums.containsKey(v))
-            return choiceSums.get(v);
-        else if (v < 3)
-            return 0;
-        else {
-            int numIndexCombos = 0;
-            for (int k = 3; k <= v; k++) {
-                // Count how many subsequences of the given length we can make when we KNOW the
-                // first and last index must be included
-                numIndexCombos += choose(v - 2, k - 2);
+    /**
+     * Count the number of times 'sequence' shows up as a subsequence in 'nums'
+     * between start and end (inclusive)
+     * 
+     * @param nums
+     * @param start
+     * @param end
+     * @param sequence
+     * @return int
+     */
+    private static int countOccurrences(long[] nums, int start, int end, long[] sequence) {
+        int[][] sols = new int[end - start + 1][sequence.length];
+        for (int i = 0; i < sols.length; i++) {
+            for (int j = 0; j < sols[i].length; j++) {
+                sols[i][j] = -1;
             }
-            choiceSums.put(v, numIndexCombos);
-            return choiceSums.get(v);
         }
+
+        return topDownNumOccurences(nums, start, end, sequence, sequence.length - 1, sols);
     }
 
-    private static int choose(int n, int k) {
-        if (combos[n - 1][k - 1] == 0) {
-            if (n == k)
-                combos[n - 1][k - 1] = 1;
-            else if (k == 1 || k == n - 1)
-                combos[n - 1][k - 1] = n;
-            else {
-                combos[n - 1][k - 1] = choose(n - 1, k - 1) + choose(n - 1, k);
+    /**
+     * Helper method to recursively count the number of times the given sequence
+     * appears in 'nums' between numsStartIndex and numsEndIndex (inclusive)
+     * 
+     * @param nums
+     * @param numsStartIndex
+     * @param numsEndIndex
+     * @param sequence
+     * @param sequenceEndIndex
+     * @param sols
+     * @return int
+     */
+    private static int topDownNumOccurences(long[] nums, int numsStartIndex, int numsEndIndex, long[] sequence,
+            int sequenceEndIndex, int[][] sols) {
+        // Solve the problem recursively
+        if (sols[numsEndIndex - numsStartIndex][sequenceEndIndex] == -1) {
+            // Then we have not solved this subproblem yet
+
+            if (numsEndIndex == numsStartIndex) { // Base case
+                if (sequenceEndIndex == 0 && nums[numsEndIndex] == sequence[sequenceEndIndex])
+                    sols[numsEndIndex - numsStartIndex][sequenceEndIndex] = 1;
+                else
+                    sols[numsEndIndex - numsStartIndex][sequenceEndIndex] = 0;
+            } else {
+                if (sequenceEndIndex == 0) {
+                    if (nums[numsEndIndex] == sequence[sequenceEndIndex]) {
+                        // Then match and backtrack
+                        sols[numsEndIndex
+                                - numsStartIndex][sequenceEndIndex] = 1
+                                        + topDownNumOccurences(nums, numsStartIndex, numsEndIndex - 1, sequence,
+                                                sequenceEndIndex, sols);
+                    } else { // We can only backtrack
+                        sols[numsEndIndex
+                                - numsStartIndex][sequenceEndIndex] = topDownNumOccurences(nums, numsStartIndex,
+                                        numsEndIndex - 1, sequence, sequenceEndIndex, sols);
+                    }
+                } else {
+                    // We are not at the beginning of nums OR at the beginning of sequence
+                    if (nums[numsEndIndex] == sequence[sequenceEndIndex]) {
+                        // Try matching, and try not matching
+                        sols[numsEndIndex
+                                - numsStartIndex][sequenceEndIndex] = topDownNumOccurences(nums, numsStartIndex,
+                                        numsEndIndex - 1, sequence, sequenceEndIndex - 1, sols);
+                        sols[numsEndIndex
+                                - numsStartIndex][sequenceEndIndex] += topDownNumOccurences(nums, numsStartIndex,
+                                        numsEndIndex - 1, sequence, sequenceEndIndex, sols);
+                    } else {
+                        // We can't match
+                        sols[numsEndIndex
+                                - numsStartIndex][sequenceEndIndex] = topDownNumOccurences(nums, numsStartIndex,
+                                        numsEndIndex - 1, sequence, sequenceEndIndex, sols);
+                    }
+                }
             }
         }
-        return combos[n - 1][k - 1];
+
+        return sols[numsEndIndex - numsStartIndex][sequenceEndIndex];
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
