@@ -38,7 +38,45 @@ import java.util.*;
  * https://open.kattis.com/problems/icpcteamgeneration
  */
 public class ICPCTeamGeneration {
+
+    static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+    static int nextInt() throws IOException {
+        return Integer.parseInt(reader.readLine().trim());
+    }
+
+    static int[] nextIntArray() throws IOException {
+        return Arrays.stream(reader.readLine().split(" ")).mapToInt(Integer::parseInt).toArray();
+    }
+
     public static void main(String[] args) throws IOException {
-        System.out.println("Hello, World!");
+        int n = nextInt();
+
+        int[][] intervals = new int[n][2];
+
+        for (int i=0; i<n; i++) {
+            int[] interval = nextIntArray();
+            interval[0] = interval[0] - 1;
+            interval[1] = interval[1] - 1;
+            // Keep our ranking/indexing consistent
+            intervals[i] = interval;
+        }
+
+        int teams = 0;
+        for (int i=intervals.length-1; i>=0; i--) {
+            int rank = i;
+            int lowestAcceptance = intervals[i][0];
+
+            int highestCompatibleTeam = lowestAcceptance;
+            while (intervals[highestCompatibleTeam][1]<rank)
+                highestCompatibleTeam++;
+            if (highestCompatibleTeam <= rank-2) { // Then we can fit three people in this team
+                // Greedily take from the top
+                teams++;
+                i=rank-2; // Then i will be subtracted to rank-3, and we will repeat on rank-3
+            }
+        }
+
+        System.out.println(teams);
     }
 }
