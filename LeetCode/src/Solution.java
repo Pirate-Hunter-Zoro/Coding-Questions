@@ -1302,16 +1302,7 @@ public class Solution {
             public int rating;
 
             // How do you compare objects of this type?
-            public static final Comparator<FoodWithRating> FOOD_RATING_COMPARATOR = new Comparator<FoodWithRating>() {
-                @Override
-                public int compare(FoodWithRating o1, FoodWithRating o2) {
-                    if (Integer.compare(o2.rating, o1.rating) != 0) {
-                        return Integer.compare(o2.rating, o1.rating);
-                    } else {
-                        return o1.food.compareTo(o2.food);
-                    }
-                };
-            };
+            public static final Comparator<FoodWithRating> FOOD_RATING_COMPARATOR=new Comparator<FoodWithRating>(){@Override public int compare(FoodWithRating o1,FoodWithRating o2){if(Integer.compare(o2.rating,o1.rating)!=0){return Integer.compare(o2.rating,o1.rating);}else{return o1.food.compareTo(o2.food);}};};
 
             /**
              * Create a FoodWithRating object
@@ -2299,6 +2290,9 @@ public class Solution {
      * For example, [2,5,10] is a subsequence of [1,2,1,2,4,1,5,10].
      * The test cases are generated so that the answer fits in 32-bit integer.
      * 
+     * Source for Inspiration:
+     * https://www.youtube.com/watch?v=YIMwwT9JdIE
+     * 
      * Link:
      * https://leetcode.com/problems/arithmetic-slices-ii-subsequence/?envType=daily-question&envId=2024-01-08
      * 
@@ -2306,122 +2300,57 @@ public class Solution {
      * @return int
      */
     public int numberOfArithmeticSlices(int[] nums) {
-        int[][] numSlices = new int[nums.length][nums.length];
-        long[] numsAsLongs = Arrays.stream(nums).mapToLong(i -> (long) i).toArray();
-
-        // We only care about arithmetic subsequences of size three or greater
-        for (int jump = 2; jump <= nums.length - 1; jump++) {
-            for (int i = 0; i < nums.length - jump; i++) {
-                int start = i; // inclusive
-                int end = start + jump; // inclusive
-                // Observe the following sub-problem relation
-                // numSlices(i,j) = numSlices(i, j+1) + numSlices(i+1, j) - numSlices(i+1,j-1)
-                // + number of new subsequences that must include nums[i] AND nums[j]
-                int newSequences = 0;
-                for (int size = 3; size <= (end - start + 1); size++) { // The size of each new sequence we
-                                                                        // encounter
-                    // There is only ONE possible new sequence of the given size since we must
-                    // include nums[start] AND nums[end]
-                    if ((nums[end] - nums[start]) % (size - 1) == 0) {
-                        // There is a possible integer difference if we want an arithmetic series of the
-                        // given size
-                        // Count all of the new sequences we produce
-                        long arithmeticDifference = ((long) nums[end] - (long) nums[start]) / ((long) size - 1l);
-                        long[] sequence = new long[size - 2];
-                        for (long place = 0l; place < sequence.length; place++) {
-                            long d = arithmeticDifference * (place + 1);
-                            sequence[(int) place] = nums[start] + d;
-                        }
-                        newSequences += countOccurrences(numsAsLongs, start + 1, end - 1, sequence);
-                    }
-                }
-                // Now to record
-                numSlices[start][end] = numSlices[start + 1][end] + numSlices[start][end - 1]
-                        - numSlices[start + 1][end - 1] + newSequences;
+        long[] longs = Arrays.stream(nums).mapToLong(i -> (long) i).toArray();
+        int numArithmeticSubsequences = 0;
+        HashMap<Pair, Integer> sols = new HashMap<>();
+        for (int j=0; j<longs.length; j++) {
+            for (int i = j+1; i < longs.length; i++) {
+                long diff = longs[i] - longs[j];
+                numArithmeticSubsequences += countArithmeticSequencesStartingHereWithDifference((long) j, diff, longs, sols);
             }
         }
 
-        return numSlices[0][numSlices.length - 1];
+        return numArithmeticSubsequences - choose(nums.length, 2) - choose(nums.length, 1); // Omit all of the sequences that we counted of length 1 and 2 (for recursive purposes)
     }
 
-    /**
-     * Count the number of times 'sequence' shows up as a subsequence in 'nums'
-     * between start and end (inclusive)
-     * 
-     * @param nums
-     * @param start
-     * @param end
-     * @param sequence
-     * @return int
-     */
-    private static int countOccurrences(long[] nums, int start, int end, long[] sequence) {
-        int[][] sols = new int[end - start + 1][sequence.length];
-        for (int i = 0; i < sols.length; i++) {
-            for (int j = 0; j < sols[i].length; j++) {
-                sols[i][j] = -1;
-            }
+    private int countArithmeticSequencesStartingHereWithDifference(long index, long difference, long[] longs, HashMap<Pair, Integer> sols) {
+        Pair thisSubProblem = new Pair(index, difference);
+        
+        if (!sols.containsKey(thisSubProblem)) {
+            // Then we have some work to do
+            // TODO - figure out how to do this part!
+            // e.g. 2,4,6,8,10 -> Pair(idx=0,diff=2) should yield 3 possible sequences (2,4,6; 2,4,6,8; 2,4,6,8,10)
         }
 
-        return topDownNumOccurences(nums, start, end, sequence, sequence.length - 1, sols);
+        return sols.get(thisSubProblem);
     }
 
-    /**
-     * Helper method to recursively count the number of times the given sequence
-     * appears in 'nums' between numsStartIndex and numsEndIndex (inclusive)
-     * 
-     * @param nums
-     * @param numsStartIndex
-     * @param numsEndIndex
-     * @param sequence
-     * @param sequenceEndIndex
-     * @param sols
-     * @return int
-     */
-    private static int topDownNumOccurences(long[] nums, int numsStartIndex, int numsEndIndex, long[] sequence,
-            int sequenceEndIndex, int[][] sols) {
-        // Solve the problem recursively
-        if (sols[numsEndIndex - numsStartIndex][sequenceEndIndex] == -1) {
-            // Then we have not solved this subproblem yet
+    private static class Pair {
+        private long startIndex;
+        private long difference;
 
-            if (numsEndIndex == numsStartIndex) { // Base case
-                if (sequenceEndIndex == 0 && nums[numsEndIndex] == sequence[sequenceEndIndex])
-                    sols[numsEndIndex - numsStartIndex][sequenceEndIndex] = 1;
-                else
-                    sols[numsEndIndex - numsStartIndex][sequenceEndIndex] = 0;
-            } else {
-                if (sequenceEndIndex == 0) {
-                    if (nums[numsEndIndex] == sequence[sequenceEndIndex]) {
-                        // Then match and backtrack
-                        sols[numsEndIndex
-                                - numsStartIndex][sequenceEndIndex] = 1
-                                        + topDownNumOccurences(nums, numsStartIndex, numsEndIndex - 1, sequence,
-                                                sequenceEndIndex, sols);
-                    } else { // We can only backtrack
-                        sols[numsEndIndex
-                                - numsStartIndex][sequenceEndIndex] = topDownNumOccurences(nums, numsStartIndex,
-                                        numsEndIndex - 1, sequence, sequenceEndIndex, sols);
-                    }
-                } else {
-                    // We are not at the beginning of nums OR at the beginning of sequence
-                    if (nums[numsEndIndex] == sequence[sequenceEndIndex]) {
-                        // Try matching, and try not matching
-                        sols[numsEndIndex
-                                - numsStartIndex][sequenceEndIndex] = topDownNumOccurences(nums, numsStartIndex,
-                                        numsEndIndex - 1, sequence, sequenceEndIndex - 1, sols);
-                        sols[numsEndIndex
-                                - numsStartIndex][sequenceEndIndex] += topDownNumOccurences(nums, numsStartIndex,
-                                        numsEndIndex - 1, sequence, sequenceEndIndex, sols);
-                    } else {
-                        // We can't match
-                        sols[numsEndIndex
-                                - numsStartIndex][sequenceEndIndex] = topDownNumOccurences(nums, numsStartIndex,
-                                        numsEndIndex - 1, sequence, sequenceEndIndex, sols);
-                    }
-                }
-            }
+        public Pair(long startIndex, long difference) {
+            this.startIndex = startIndex;
+            this.difference = difference;
         }
 
-        return sols[numsEndIndex - numsStartIndex][sequenceEndIndex];
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null)
+                return false;
+            else if (!(obj instanceof Pair))
+                return false;
+            
+            Pair other = (Pair)obj;
+            return other.difference == this.difference && other.startIndex == this.startIndex;
+        }
+
+        @Override
+        public int hashCode() {
+            // Source:
+            // https://stackoverflow.com/questions/14677993/how-to-create-a-hashmap-with-two-keys-key-pair-value
+            return (int)((this.startIndex << 16) + this.difference);
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2704,9 +2633,7 @@ public class Solution {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static void main(String[] args) {
-        int[] nums = new int[] { 2147483638, 2147483639, 2147483640, 2147483641, 2147483642, 2147483643, 2147483644,
-                2147483645, 2147483646, 2147483647, -2147483648, -2147483647, -2147483646, -2147483645, -2147483644,
-                -2147483643, -2147483642, -2147483641, -2147483640, -2147483639 };
+        int[] nums = new int[] { 2, 4, 6, 8, 10 };
         int v = new Solution().numberOfArithmeticSlices(nums);
         System.out.println(v);
 
