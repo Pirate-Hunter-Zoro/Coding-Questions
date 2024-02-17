@@ -1302,7 +1302,16 @@ public class Solution {
             public int rating;
 
             // How do you compare objects of this type?
-            public static final Comparator<FoodWithRating> FOOD_RATING_COMPARATOR=new Comparator<FoodWithRating>(){@Override public int compare(FoodWithRating o1,FoodWithRating o2){if(Integer.compare(o2.rating,o1.rating)!=0){return Integer.compare(o2.rating,o1.rating);}else{return o1.food.compareTo(o2.food);}};};
+            public static final Comparator<FoodWithRating> FOOD_RATING_COMPARATOR = new Comparator<FoodWithRating>() {
+                @Override
+                public int compare(FoodWithRating o1, FoodWithRating o2) {
+                    if (Integer.compare(o2.rating, o1.rating) != 0) {
+                        return Integer.compare(o2.rating, o1.rating);
+                    } else {
+                        return o1.food.compareTo(o2.food);
+                    }
+                };
+            };
 
             /**
              * Create a FoodWithRating object
@@ -2231,166 +2240,6 @@ public class Solution {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Given a string s, return the number of different non-empty palindromic
-     * subsequences in s. Since the answer may be very large, return it modulo 109 +
-     * 7.
-     * 
-     * A subsequence of a string is obtained by deleting zero or more characters
-     * from the string.
-     * 
-     * A sequence is palindromic if it is equal to the sequence reversed.
-     * 
-     * Two sequences a1, a2, ... and b1, b2, ... are different if there is some i
-     * for which ai != bi.
-     * 
-     * Link:
-     * https://leetcode.com/problems/count-different-palindromic-subsequences/description/
-     * 
-     * @param s
-     * @return int
-     */
-    public int countPalindromicSubsequences(String s) {
-
-        long[][] sols = new long[s.length()][s.length()];
-
-        // First the base cases
-        for (int i = 0; i < s.length(); i++) {
-            sols[i][i] = 1l;
-        }
-        for (int i = 0; i < s.length() - 1; i++) {
-            if (s.charAt(i) == s.charAt(i + 1))
-                sols[i][i + 1] = 3l;
-            else
-                sols[i][i + 1] = 2l;
-        }
-
-        // Now iterate through the rest of the array
-        // TODO - figure out how!
-
-        return (int) sols[0][sols.length - 1];
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Given an integer array nums, return the number of all the arithmetic
-     * subsequences of nums.
-     * 
-     * A sequence of numbers is called arithmetic if it consists of at least three
-     * elements and if the difference between any two consecutive elements is the
-     * same.
-     * 
-     * For example, [1, 3, 5, 7, 9], [7, 7, 7, 7], and [3, -1, -5, -9] are
-     * arithmetic sequences.
-     * For example, [1, 1, 2, 5, 7] is not an arithmetic sequence.
-     * A subsequence of an array is a sequence that can be formed by removing some
-     * elements (possibly none) of the array.
-     * 
-     * For example, [2,5,10] is a subsequence of [1,2,1,2,4,1,5,10].
-     * The test cases are generated so that the answer fits in 32-bit integer.
-     * 
-     * Source for Inspiration:
-     * https://www.youtube.com/watch?v=YIMwwT9JdIE
-     * 
-     * Link:
-     * https://leetcode.com/problems/arithmetic-slices-ii-subsequence/?envType=daily-question&envId=2024-01-08
-     * 
-     * @param nums
-     * @return int
-     */
-    public int numberOfArithmeticSlices(int[] nums) {
-        long[] longs = Arrays.stream(nums).mapToLong(i -> (long) i).toArray();
-        int numArithmeticSubsequences = 0;
-        HashMap<Pair, Integer> sols = new HashMap<>();
-        for (int j=0; j<longs.length; j++) {
-            for (int i = j+1; i < longs.length; i++) {
-                long diff = longs[i] - longs[j];
-                numArithmeticSubsequences += countArithmeticSequencesStartingHereWithDifference((long) j, diff, longs, sols);
-            }
-        }
-
-        return numArithmeticSubsequences - choose(nums.length, 2) - choose(nums.length, 1); // Omit all of the sequences that we counted of length 1 and 2 (for recursive purposes)
-    }
-
-    private int countArithmeticSequencesStartingHereWithDifference(long index, long difference, long[] longs, HashMap<Pair, Integer> sols) {
-        Pair thisSubProblem = new Pair(index, difference);
-        
-        if (!sols.containsKey(thisSubProblem)) {
-            // Then we have some work to do
-            // TODO - figure out how to do this part!
-            // e.g. 2,4,6,8,10 -> Pair(idx=0,diff=2) should yield 3 possible sequences (2,4,6; 2,4,6,8; 2,4,6,8,10)
-        }
-
-        return sols.get(thisSubProblem);
-    }
-
-    private static class Pair {
-        private long startIndex;
-        private long difference;
-
-        public Pair(long startIndex, long difference) {
-            this.startIndex = startIndex;
-            this.difference = difference;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null)
-                return false;
-            else if (!(obj instanceof Pair))
-                return false;
-            
-            Pair other = (Pair)obj;
-            return other.difference == this.difference && other.startIndex == this.startIndex;
-        }
-
-        @Override
-        public int hashCode() {
-            // Source:
-            // https://stackoverflow.com/questions/14677993/how-to-create-a-hashmap-with-two-keys-key-pair-value
-            return (int)((this.startIndex << 16) + this.difference);
-        }
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * You are given a rows x cols matrix grid representing a field of cherries
-     * where grid[i][j] represents the number of cherries that you can collect from
-     * the (i, j) cell.
-     * 
-     * You have two robots that can collect cherries for you:
-     * 
-     * Robot #1 is located at the top-left corner (0, 0), and
-     * Robot #2 is located at the top-right corner (0, cols - 1).
-     * Return the maximum number of cherries collection using both robots by
-     * following the rules below:
-     * 
-     * From a cell (i, j), robots can move to cell (i + 1, j - 1), (i + 1, j), or (i
-     * + 1, j + 1).
-     * When any robot passes through a cell, It picks up all cherries, and the cell
-     * becomes an empty cell.
-     * When both robots stay in the same cell, only one takes the cherries.
-     * Both robots cannot move outside of the grid at any moment.
-     * Both robots should reach the bottom row in grid.
-     * 
-     * Link:
-     * https://leetcode.com/problems/cherry-pickup-ii/description/?envType=daily-question&envId=2024-02-11
-     * 
-     * @param grid
-     * @return int
-     */
-    public int cherryPickup(int[][] grid) {
-        // TODO
-        return 0;
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
      * Given an integer n, return the least number of perfect square numbers that
      * sum to n.
      * 
@@ -2633,13 +2482,7 @@ public class Solution {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static void main(String[] args) {
-        int[] nums = new int[] { 2, 4, 6, 8, 10 };
-        int v = new Solution().numberOfArithmeticSlices(nums);
-        System.out.println(v);
-
-        int[][] grid = new int[][] { { 3, 1, 1 }, { 2, 5, 1 }, { 1, 5, 5 }, { 2, 1, 1 } };
-        v = new Solution().cherryPickup(grid);
-        System.out.println(v);
+        
     }
 
 }
