@@ -2,6 +2,26 @@ from collections import defaultdict
 
 
 class Solution(object):
+    factorial_sols = [defaultdict(int) for _ in range(1001)]
+
+    @staticmethod
+    def choose(n, k):
+        if k > n:
+            return 0
+
+        if Solution.factorial_sols[n][k] == 0:
+            if k == 0 or k == n:
+                Solution.factorial_sols[n][k] = 1
+            else:
+                Solution.factorial_sols[n][k] = Solution.choose(
+                    n - 1, k - 1
+                ) + Solution.choose(n - 1, k)
+
+        return Solution.factorial_sols[n][k]
+
+    """
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    """
 
     def numberOfArithmeticSlices(self, nums):
         """
@@ -18,6 +38,9 @@ class Solution(object):
 
         Link:
         https://leetcode.com/problems/arithmetic-slices-ii-subsequence/description/?envType=daily-question&envId=2024-01-08
+
+        Inspiration:
+        https://www.youtube.com/watch?v=YIMwwT9JdIE&t=1103s
         """
         """
         :type nums: List[int]
@@ -25,3 +48,20 @@ class Solution(object):
         """
         sequences = 0
         sols = [defaultdict(int) for _ in range(len(nums))]
+
+        for i in range(len(nums)):
+            differences = set([])
+            for j in range(i):
+                diff = nums[i] - nums[j]
+                sols[i][diff] += 1 + sols[j][diff]
+                differences.add(diff)
+            for diff in differences:
+                sequences += sols[i][diff]
+
+        return sequences - Solution.choose(len(nums), 2)
+
+    """
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    """
+
+    
