@@ -19,13 +19,32 @@ class Solution(object):
 
         return Solution.factorial_sols[n][k]
 
+    mod = 1000000007
+
+    @staticmethod
+    def modularAdd(n1, n2):
+        return ((n1 % Solution.mod) + (n2 % Solution.mod)) % Solution.mod
+
+    @staticmethod
+    def modularSubtract(n1, n2):
+        first = n1 % Solution.mod
+        second = n2 % Solution.mod
+        if first >= second:
+            return (first - second) % Solution.mod
+        else:
+            return ((first % Solution.mod) + (Solution.mod - second)) % Solution.mod
+
+    @staticmethod
+    def modularMultiply(n1, n2):
+        return ((n1 % Solution.mod) * (n2 % Solution.mod)) % Solution.mod
+
     """
     --------------------------------------------------------------------------------------------------------------------------------------------------------------------
     """
 
     def numberOfArithmeticSlices(self, nums):
         """
-            Given an integer array nums, return the number of all the arithmetic subsequences of nums.
+        Given an integer array nums, return the number of all the arithmetic subsequences of nums.
 
         A sequence of numbers is called arithmetic if it consists of at least three elements and if the difference between any two consecutive elements is the same.
 
@@ -64,4 +83,25 @@ class Solution(object):
     --------------------------------------------------------------------------------------------------------------------------------------------------------------------
     """
 
-    
+    def countPalindromicSubsequences(self, s):
+        """
+        Given a string s, return the number of different non-empty palindromic subsequences in s. Since the answer may be very large, return it modulo 109 + 7.
+
+        A subsequence of a string is obtained by deleting zero or more characters from the string.
+
+        A sequence is palindromic if it is equal to the sequence reversed.
+
+        Two sequences a1, a2, ... and b1, b2, ... are different if there is some i for which ai != bi.
+
+        Link:
+        https://leetcode.com/problems/count-palindromic-subsequences/description/
+        """
+        """
+        :type s: str
+        :rtype: int
+        """
+        
+
+    """
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    """
