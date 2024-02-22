@@ -1,4 +1,5 @@
 from collections import defaultdict
+import copy
 
 
 class Solution(object):
@@ -32,7 +33,9 @@ class Solution(object):
         if first >= second:
             return (first - second) % Solution.mod
         else:
-            return ((first % Solution.mod) + (Solution.mod - second)) % Solution.mod
+            return (
+                (first % Solution.mod) + (Solution.mod - (second % Solution.mod))
+            ) % Solution.mod
 
     @staticmethod
     def modularMultiply(n1, n2):
@@ -93,15 +96,126 @@ class Solution(object):
 
         Two sequences a1, a2, ... and b1, b2, ... are different if there is some i for which ai != bi.
 
+        The string s only contains the characters, 'a','b','c', and 'd'
+
         Link:
-        https://leetcode.com/problems/count-palindromic-subsequences/description/
+        https://leetcode.com/problems/count-different-palindromic-subsequences/description/
         """
         """
         :type s: str
         :rtype: int
         """
-        
+        dp = []
+        outermost_pairs = {"a": [], "b": [], "c": [], "d": []}
+        for i in range(len(s)):
+            row = []
+            for j in range(len(s)):
+                row.append(0)
+            dp.append(row)
+
+            for char in outermost_pairs:
+                row = []
+                for j in range(len(s)):
+                    row.append((-1, -1))
+                outermost_pairs[char].append(row)
+
+        unique_chars = copy.deepcopy(dp)
+
+        Solution.top_down_count_palindromes(
+            0, len(s) - 1, s, dp, unique_chars, outermost_pairs
+        )
+
+        # Do not count the empty sequence
+        return Solution.modularSubtract(dp[0][len(s) - 1], 1)
+
+    @staticmethod
+    def top_down_count_palindromes(start, end, s, dp, unique_chars, outermost_pairs):
+        """
+        Static top-down recursive method that uses dynamic programming to count the number of palindromatic subsequences within a string given a particular range
+        """
+        if dp[start][end] == 0:  # Then we have not solved this (sub)problem yet
+            if start == end:
+                # 'a' or empty
+                dp[start][end] = 2
+            elif start == end - 1:
+                # 'a', 'aa', or empty
+                dp[start][end] = 3
+            else:
+                # First count the number of unique characters
+                total = Solution.num_unique_chars(s, start, end, unique_chars)
+
+                # Simply find all nested, outermost occuring pairs - inner_start, inner_end
+                inner_palindromes = 0
+                for char in ["a", "b", "c", "d"]:
+                    inner_start, inner_end = Solution.outermost_pair(
+                        s, start, end, char, outermost_pairs
+                    )
+                    # All inner palindromes are of the form 'a*a' (or 'b*b', etc.), as long as we have two different 'a' indices then approach that subproblem in between to yield all possible '*'
+                    if inner_end > inner_start:
+                        inner_palindromes = Solution.modularAdd(
+                            inner_palindromes,
+                            Solution.top_down_count_palindromes(
+                                inner_start + 1,
+                                inner_end - 1,
+                                s,
+                                dp,
+                                unique_chars,
+                                outermost_pairs,
+                            ),
+                        )
+
+                total = Solution.modularAdd(total, inner_palindromes)
+
+                # Also count the empty sequence
+                total = Solution.modularAdd(total, 1)
+
+                # Store our solution
+                dp[start][end] = total
+
+        return dp[start][end]
+
+    @staticmethod
+    def num_unique_chars(s, start, end, unique_chars):
+        """
+        Count the number of unique characters between start and end
+        """
+        if unique_chars[start][end] == 0:
+            uniques = set()
+            for i in range(start, end + 1):
+                uniques.add(s[i])
+            unique_chars[start][end] = len(uniques)
+
+        return unique_chars[start][end]
+
+    @staticmethod
+    def outermost_pair(s, start, end, char, outermost_pairs):
+        """
+        Static top-down recursive helper method to determine outermost range in [start,end] - call it k,l - where s[k] == char and s[l] == char
+        """
+        if outermost_pairs[char][start][end][0] == -1:
+            # Then we have not solved this (sub)problem yet
+            if start < end:
+                if s[start] == char and s[end] == char:
+                    outermost_pairs[char][start][end] = (start, end)
+                elif s[start] == char:  # No point in moving up start
+                    outermost_pairs[char][start][end] = Solution.outermost_pair(
+                        s, start, end - 1, char, outermost_pairs
+                    )
+                elif s[end] == char:  # No point in moving down end
+                    outermost_pairs[char][start][end] = Solution.outermost_pair(
+                        s, start + 1, end, char, outermost_pairs
+                    )
+                else:  # Need to move up both
+                    outermost_pairs[char][start][end] = Solution.outermost_pair(
+                        s, start + 1, end - 1, char, outermost_pairs
+                    )
+            else:
+                outermost_pairs[char][start][end] = (1, 0)
+
+        return outermost_pairs[char][start][end]
 
     """
     --------------------------------------------------------------------------------------------------------------------------------------------------------------------
     """
+    
+    
