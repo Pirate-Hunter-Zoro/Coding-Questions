@@ -249,34 +249,50 @@ class Solution(object):
         # https://leetcode.com/problems/split-array-largest-sum/solutions/1899947/c-simple-code-easy-to-understand-tc-o-n-log-sum-nums-sc-o-1/
         # From user:
         # https://leetcode.com/manish_rawt/
-        min_possible = maxes[0][len(maxes[0])-1]
-        max_possible = sums[0][len(sums[0])-1]
-        beat_this_sum = (min_possible + max_possible) / 2
-        sols = {}
-        while (min_possible < max_possible):
-            if can_achieve_less_than_or_equal(beat_this_sum, k, sols, sums, maxes, 0, len(nums)-1):
+        # Also user:
+        # https://leetcode.com/anant_0059/
+        min_possible = maxes[0][len(maxes[0]) - 1]
+        if k == len(nums):  # Base case
+            return min_possible
+        max_possible = sums[0][len(sums[0]) - 1]
+        if k == 1:  # Base case
+            return max_possible
+        best = max_possible
+        while min_possible <= max_possible:
+            sum_goal = int((min_possible + max_possible) / 2)
+            if Solution.can_achieve_less_than_or_equal(sum_goal, nums, k):
                 # try to do better
-                max_possible = beat_this_sum
-                beat_this_sum = (min_possible + max_possible) / 2
+                best = sum_goal
+                max_possible = sum_goal - 1
             else:
                 # we'll have to settle for worse
-                min_possible = beat_this_sum
-                beat_this_sum = (min_possible + max_possible) / 2
+                min_possible = sum_goal + 1
 
-        return min_possible
+        return best
 
     @staticmethod
-    def can_achieve_less_than_or_equal(beat_this_sum, subarrays, sols, sums, maxes, start, end):
+    def can_achieve_less_than_or_equal(sum_goal, nums, k):
         """
         Helper method to determine if a maximal sum less than or equal to beat_this_sum is achievable given the start, end, and number of subarrays we must create
         """
-        if beat_this_sum in sols.keys():
-            return sols[beat_this_sum]
+        intervals = 0
+        index = 0
+        while index < len(nums):
+            current_interval_sum = 0
+            while current_interval_sum <= sum_goal and index < len(nums):
+                if sum_goal-nums[index] >= current_interval_sum:
+                    current_interval_sum += nums[index]
+                    index += 1
+                else:
+                    break
+            intervals += 1
 
-        # TODO - solve
-
-        return sols[beat_this_sum]
+        return intervals <= k
 
     """
     --------------------------------------------------------------------------------------------------------------------------------------------------------------------
     """
+
+nums = [5, 2, 4, 1, 3, 6, 0]
+k = 4
+print(Solution().splitArray(nums, k))
