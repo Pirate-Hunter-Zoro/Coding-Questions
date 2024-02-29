@@ -1,5 +1,98 @@
 from collections import defaultdict
 import copy
+import math
+
+class TreeNode(object):
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+    @staticmethod
+    def make_node(val_list: list[int]):
+        root = TreeNode(val_list[0])
+        idx = 1
+        node_map = {}
+        node_map[0] = root
+        for i in range(1,len(val_list)):
+            v = val_list[i]
+            if v is not None:
+                node_map[i] = TreeNode(v)
+
+        parent_index = 0
+        while idx < len(val_list) and parent_index < len(val_list):
+            parent = node_map[parent_index]
+            v = val_list[idx]
+            if v is not None:
+                parent.left = node_map[idx]
+            idx += 1
+            if idx < len(val_list):
+                v = val_list[idx]
+                if v is not None:
+                    parent.right = node_map[idx]
+            idx += 1
+            parent_index += 1
+            while parent_index < len(val_list) and not parent_index in node_map.keys():
+                parent_index += 1
+
+        return root
+
+    def __eq__(self, __value: object) -> bool:
+        if not isinstance(__value, self.__class__):
+            return False
+
+        if self.val == __value.val:
+            if self.left == None and self.right == None:
+                return __value.left == None and __value.right == None
+            elif self.left == None:
+                return __value.left == None and self.right == __value.right
+            elif self.right == None:
+                return __value.right == None and self.left == __value.left
+            else:
+                return self.left == __value.left and self.right == __value.right
+        else:
+            return False
+
+
+class CBTInserter(object):
+    """_summary_
+
+    Args:
+        object (_type_): _description_
+    """
+    """
+    A complete binary tree is a binary tree in which every level, except possibly the last, is completely filled, and all nodes are as far left as possible.
+
+    Design an algorithm to insert a new node to a complete binary tree keeping it complete after the insertion.
+
+    Implement the CBTInserter class:
+
+    - CBTInserter(TreeNode root) Initializes the data structure with the root of the complete binary tree.
+    - int insert(int v) Inserts a TreeNode into the tree with value Node.val == val so that the tree remains complete, and returns the value of the parent of the inserted TreeNode.
+    - TreeNode get_root() Returns the root node of the tree.
+    
+    Link:
+    https://leetcode.com/problems/complete-binary-tree-inserter/description/
+    """
+
+    def __init__(self, root):
+        """
+        :type root: TreeNode
+        """
+        self.root = root
+        self.current_level = [root]
+        self.add_children_index = 0
+
+    def insert(self, val):
+        """
+        :type val: int
+        :rtype: int
+        """
+
+    def get_root(self):
+        """
+        :rtype: TreeNode
+        """
 
 
 class Solution(object):
@@ -241,9 +334,9 @@ class Solution(object):
             sums[i][i] = nums[i]
         maxes = copy.deepcopy(sums)
         for start in range(len(nums)):
-            for end in range(start+1, len(nums)):
-                sums[start][end] = sums[start][end-1] + nums[end]
-                maxes[start][end] = max(maxes[start][end-1], nums[end])
+            for end in range(start + 1, len(nums)):
+                sums[start][end] = sums[start][end - 1] + nums[end]
+                maxes[start][end] = max(maxes[start][end - 1], nums[end])
 
         # Inspiration for the following idea:
         # https://leetcode.com/problems/split-array-largest-sum/solutions/1899947/c-simple-code-easy-to-understand-tc-o-n-log-sum-nums-sc-o-1/
@@ -280,7 +373,7 @@ class Solution(object):
         while index < len(nums):
             current_interval_sum = 0
             while current_interval_sum <= sum_goal and index < len(nums):
-                if sum_goal-nums[index] >= current_interval_sum:
+                if sum_goal - nums[index] >= current_interval_sum:
                     current_interval_sum += nums[index]
                     index += 1
                 else:
@@ -293,6 +386,61 @@ class Solution(object):
     --------------------------------------------------------------------------------------------------------------------------------------------------------------------
     """
 
-nums = [5, 2, 4, 1, 3, 6, 0]
-k = 4
-print(Solution().splitArray(nums, k))
+    def isEvenOddTree(self, root):
+        """
+        :type root: TreeNode
+        :rtype: bool
+        """
+        """
+        A binary tree is named Even-Odd if it meets the following conditions:
+        - The root of the binary tree is at level index 0, its children are at level index 1, their children are at level index 2, etc.
+        - For every even-indexed level, all nodes at the level have odd integer values in strictly increasing order (from left to right).
+        - For every odd-indexed level, all nodes at the level have even integer values in strictly decreasing order (from left to right).
+        - Given the root of a binary tree, return true if the binary tree is Even-Odd, otherwise return false.
+        
+        Link:
+        https://leetcode.com/problems/even-odd-tree/description/?envType=daily-question&envId=2024-02-29
+        """
+        children = []
+        if root.left != None:
+            children.append(root.left)
+        if root.right != None:
+            children.append(root.right)
+        if root.val % 2 == 0:
+            return False
+        odd = True
+        while len(children) > 0:
+            current = children[0]
+            if odd:
+                if current.val % 2 == 1:
+                    return False
+            else: 
+                if current.val % 2 == 0:
+                    return False
+            index = 1
+            while index < len(children):
+                next = children[index]
+                if odd:
+                    if next.val % 2 == 1: # must be even
+                        return False
+                    if next.val >= current.val: # need to be in strictly decreasing order
+                        return False
+                    current = next
+                    index += 1
+                else:
+                    if next.val % 2 == 0: # must be odd
+                        return False
+                    if next.val <= current.val: # need to be in strictly increasing order
+                        return False
+                    current = next
+                    index += 1
+            odd = not odd
+            next_children = []
+            for n in children:
+                if n.left != None:
+                    next_children.append(n.left)
+                if n.right != None:
+                    next_children.append(n.right)
+            children = next_children
+
+        return True
