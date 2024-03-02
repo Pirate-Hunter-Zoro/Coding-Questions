@@ -27,10 +27,9 @@ class CBTInserter(object):
         """
         self.root = root
         self.current_level = [root]
-        layer = [root]
-        while (len(layer)>0):
+        while (len(self.current_level)>0):
             next = []
-            for n in layer:
+            for n in self.current_level:
                 if n.left != None:
                     next.append(n.left)
                 else:
@@ -40,9 +39,8 @@ class CBTInserter(object):
                     next.append(n.right)
                 else:
                     break
-            if layer[len(layer)-1].right != None:
-                self.current_level = layer
-                layer = next
+            if self.current_level[len(self.current_level)-1].right != None:
+                self.current_level = next
             else:
                 break
         idx = 0
