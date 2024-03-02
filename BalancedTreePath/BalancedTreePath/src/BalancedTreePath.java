@@ -54,11 +54,129 @@ public class BalancedTreePath {
 
     public static void main(String[] args) throws IOException {
 
+        HashSet<TreeNode> nodeOpenings = new HashSet<>();
+        HashMap<Integer, TreeNode> nodes = new HashMap<>();
+        int n = nextInt();
+        String chars = nextLine();
+        for (int i = 0; i < n; i++) {
+            int nodeId = i + 1;
+            char c = chars.charAt(i);
+            nodes.put(nodeId, new TreeNode(nodeId, c));
+            if (c == '(' || c == '[' || c == '{') {
+                nodeOpenings.add(nodes.get(nodeId));
+            }
+        }
+
+        for (int i = 0; i < n-1; i++) {
+            int[] connection = nextIntArray();
+            int first = connection[0];
+            int second = connection[1];
+            nodes.get(first).connections.add(nodes.get(second));
+            nodes.get(second).connections.add(nodes.get(first));
+        }
+
+        int numPaths = 0;
+        for (TreeNode start : nodeOpenings) {
+            numPaths += start.findNumBalancedStartingHere();
+        }
+
+        System.out.println(numPaths);
+
     }
 
     static class TreeNode {
-        private int id;
-        private char annotation;
-        private int numBalancedPathsStartingHere = -1;
+        final int id;
+        final char annotation;
+        int numBalancedPathsStartingHere = -1;
+
+        static final HashSet<Character> opening = new HashSet<Character>(Arrays.asList('(','{','['));
+        static final HashSet<Character> closing = new HashSet<Character>(Arrays.asList(')', '}', ']'));
+
+        static final HashMap<Character,Character> corresponding = new HashMap<Character, Character>() {
+            {
+                put(')', '(');
+                put('}', '{');
+                put(']','[');
+            }
+        };
+
+        ArrayList<TreeNode> connections = new ArrayList<>();
+
+        TreeNode(int id, char annotation) {
+            this.id = id;
+            this.annotation = annotation;
+            if (closing.contains(this.annotation))
+                this.numBalancedPathsStartingHere = 0;
+        }
+
+        public void setNumBalancedPathsStartingHere(int numBalancedPathsStartingHere) {
+            this.numBalancedPathsStartingHere = numBalancedPathsStartingHere;
+        }
+
+        public int findNumBalancedStartingHere() {
+            if (this.numBalancedPathsStartingHere == -1) {
+                this.numBalancedPathsStartingHere = 0;
+                for (TreeNode next : this.connections) {
+                    Stack<Character> chars = new Stack<>();
+                    chars.push(this.annotation);
+                    this.numBalancedPathsStartingHere += next.countPathsJustCameFrom(this, chars);
+                }
+            }
+            return this.numBalancedPathsStartingHere;
+        }
+
+        private int countPathsJustCameFrom(TreeNode cameFrom, Stack<Character> chars) {
+            char prevChar = chars.peek();
+            if (opening.contains(this.annotation)) {
+                chars.push(this.annotation);
+                int paths = 0;
+                for (TreeNode next : this.connections) {
+                    if (!next.equals(cameFrom)) {
+                        paths += next.countPathsJustCameFrom(this, chars); 
+                    }
+                }
+                return paths;
+            } else {
+                if (corresponding.get(this.annotation) != prevChar) {
+                    // we just ran into a closing character that does NOT close the most recent opening character - dead end
+                    return 0;
+                } else {
+                    chars.pop();
+                    // we did just close the most recent non-closed opening character
+                    // did that empty our stack?
+                    if (chars.empty()) {
+                        int paths = 1;
+                        for (TreeNode neighbor : this.connections) {
+                            if (!neighbor.equals(cameFrom)) {
+                                paths += neighbor.findNumBalancedStartingHere();
+                            }
+                        }
+                        return paths;
+                    } else {
+                        // we did not empty the stack, so progress from here
+                        int paths = 0;
+                        for (TreeNode neighbor : this.connections) {
+                            if (!neighbor.equals(cameFrom)) {
+                                paths += neighbor.countPathsJustCameFrom(this, chars);
+                            }
+                        }
+                        return paths;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null || !(obj instanceof TreeNode))
+                return false;
+            TreeNode other = (TreeNode) obj;
+            return other.id == this.id;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(this.id);
+        }
     }
 }
