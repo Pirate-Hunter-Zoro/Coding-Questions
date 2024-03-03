@@ -3,6 +3,7 @@ import copy
 import math
 from TreeNode import TreeNode
 
+
 class Solution(object):
     factorial_sols = [defaultdict(int) for _ in range(1001)]
 
@@ -322,23 +323,27 @@ class Solution(object):
             if odd:
                 if current.val % 2 == 1:
                     return False
-            else: 
+            else:
                 if current.val % 2 == 0:
                     return False
             index = 1
             while index < len(children):
                 next = children[index]
                 if odd:
-                    if next.val % 2 == 1: # must be even
+                    if next.val % 2 == 1:  # must be even
                         return False
-                    if next.val >= current.val: # need to be in strictly decreasing order
+                    if (
+                        next.val >= current.val
+                    ):  # need to be in strictly decreasing order
                         return False
                     current = next
                     index += 1
                 else:
-                    if next.val % 2 == 0: # must be odd
+                    if next.val % 2 == 0:  # must be odd
                         return False
-                    if next.val <= current.val: # need to be in strictly increasing order
+                    if (
+                        next.val <= current.val
+                    ):  # need to be in strictly increasing order
                         return False
                     current = next
                     index += 1
@@ -352,3 +357,92 @@ class Solution(object):
             children = next_children
 
         return True
+
+    """
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    """
+
+    def findCheapestPrice(self, n, flights, src, dst, k):
+        """
+        :type n: int
+        :type flights: List[List[int]]
+        :type src: int
+        :type dst: int
+        :type k: int
+        :rtype: int
+        """
+        """
+        There are n cities connected by some number of flights. You are given an array flights where flights[i] = [fromi, toi, pricei] indicates that there is a flight from city fromi to city toi with cost pricei.
+        You are also given three integers src, dst, and k, return the cheapest price from src to dst with at most k stops. If there is no such route, return -1.
+        
+        Link:
+        https://leetcode.com/problems/cheapest-flights-within-k-stops/description/?envType=daily-question&envId=2024-03-03
+        """
+        # At most n^3 = 10^6
+        optimal_path_given_length = [
+            [[-1 for i in range(n)] for i in range(n)] for i in range(k + 1)
+        ]
+        # first index is length, second index is start node, third index is end node
+
+        for flight in flights:  # record the price of flights with 0 stops - base case
+            optimal_path_given_length[0][flight[0]][flight[1]] = flight[2]
+
+        for stops in range(1, k + 1):
+            for start in range(n):
+                for end in range(n):
+                    if start != end:
+                        # first guess
+                        optimal_path_given_length[stops][start][end] = (
+                            optimal_path_given_length[stops - 1][start][end]
+                        )
+                        # let's see if we can do better
+                        for intermediate in range(n):
+                            if intermediate != start and intermediate != end:
+                                # start -> intermediate -> end
+                                intermediate_stops = stops - 1
+                                if (
+                                    optimal_path_given_length[intermediate_stops][
+                                        start
+                                    ][intermediate]
+                                    != -1
+                                ):
+                                    if (
+                                        optimal_path_given_length[0][
+                                            intermediate
+                                        ][end]
+                                        != -1
+                                    ):
+                                        if (
+                                            optimal_path_given_length[stops][start][end]
+                                            == -1
+                                        ):
+                                            optimal_path_given_length[stops][start][
+                                                end
+                                            ] = (
+                                                optimal_path_given_length[
+                                                    intermediate_stops
+                                                ][start][intermediate]
+                                                + optimal_path_given_length[0][
+                                                    intermediate
+                                                ][end]
+                                            )
+                                        else:
+                                            optimal_path_given_length[stops][start][
+                                                end
+                                            ] = min(
+                                                optimal_path_given_length[stops][start][
+                                                    end
+                                                ],
+                                                optimal_path_given_length[
+                                                    intermediate_stops
+                                                ][start][intermediate]
+                                                + optimal_path_given_length[0][
+                                                    intermediate
+                                                ][end],
+                                            )
+
+        return optimal_path_given_length[k][src][dst]
+
+
+flights = [[0, 1, 100], [1, 2, 100], [2, 0, 100], [1, 3, 600], [2, 3, 200]]
+print(Solution().findCheapestPrice(4, flights, 0, 3, 1))
