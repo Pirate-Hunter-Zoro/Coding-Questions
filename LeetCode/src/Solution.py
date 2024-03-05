@@ -407,9 +407,7 @@ class Solution(object):
                                     != -1
                                 ):
                                     if (
-                                        optimal_path_given_length[0][
-                                            intermediate
-                                        ][end]
+                                        optimal_path_given_length[0][intermediate][end]
                                         != -1
                                     ):
                                         if (
@@ -443,6 +441,74 @@ class Solution(object):
 
         return optimal_path_given_length[k][src][dst]
 
+    """
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    """
+
+    def bagOfTokensScore(self, tokens, power):
+        """
+        :type tokens: List[int]
+        :type power: int
+        :rtype: int
+        """
+        """
+        You start with an initial power of power, an initial score of 0, and a bag of tokens given as an integer array tokens, where each tokens[i] donates the value of token[i].
+        Your goal is to maximize the total score by strategically playing these tokens. In one move, you can play an unplayed token in one of the two ways (but not both for the same token):
+            Face-up: If your current power is at least tokens[i], you may play tokeni, losing tokens[i] power and gaining 1 score.
+            Face-down: If your current score is at least 1, you may play token[i], gaining tokens[i] power and losing 1 score.
+        Return the maximum possible score you can achieve after playing any number of tokens.
+        
+        Link:
+        https://leetcode.com/problems/bag-of-tokens/description/?envType=daily-question&envId=2024-03-04
+        """
+        if (len(tokens) == 0):
+            return 0
+
+        tokens.sort()
+        if power < tokens[0]:
+            return 0
+        else:
+            max_score = 1
+            score = 1
+            power -= tokens[0]
+            left_index = 1
+            right_index = len(tokens)-1
+            while (right_index >= left_index):
+                if power >= tokens[left_index]:
+                    power -= tokens[left_index]
+                    score += 1
+                    left_index += 1
+                    max_score = max(max_score, score)
+                else:
+                    if score >= 1:
+                        score -= 1
+                        power += tokens[right_index]
+                        right_index -= 1
+                    else:
+                        break
+            return max_score
+    """
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    """
+
+    def maxJumps(self, arr, d):
+        """
+        :type arr: List[int]
+        :type d: int
+        :rtype: int
+        """
+        """
+        Given an array of integers arr and an integer d. In one step you can jump from index i to index:
+            i + x where: i + x < arr.length and  0 < x <= d.
+            i - x where: i - x >= 0 and  0 < x <= d.
+        In addition, you can only jump from index i to index j if arr[i] > arr[j] and arr[i] > arr[k] for all indices k between i and j (More formally min(i, j) < k < max(i, j)).
+        You can choose any index of the array and start jumping. Return the maximum number of indices you can visit.
+        Notice that you can not jump outside of the array at any time.
+        
+        Link:
+        https://leetcode.com/problems/jump-game-v/description/
+        """
+        
 
 flights = [[0, 1, 100], [1, 2, 100], [2, 0, 100], [1, 3, 600], [2, 3, 200]]
 print(Solution().findCheapestPrice(4, flights, 0, 3, 1))
