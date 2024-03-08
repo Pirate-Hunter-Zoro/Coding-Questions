@@ -44,6 +44,8 @@ public class OnCallTeam {
             // Iterates through all possible bitstrings of service selections
             // For each service selection, find how many engineers cover at least one of its services
             int numServicesSelected = Integer.bitCount(serviceSelection);
+            if (numServicesSelected > best)
+                continue;
 
             int numAssignableEngineers = 0;
             // Compute the size of the union of all the engineers which can be assigned to at least one of the tasks in this selection
@@ -57,9 +59,13 @@ public class OnCallTeam {
                             // We have not yet used this engineer for this service selection
                             maxSelectionEngineerUsedIn[engineer-1] = serviceSelection; // Now we have
                             numAssignableEngineers++;
+                            if (numAssignableEngineers >= numServicesSelected)
+                                break;
                         }
                     }
                 }
+                if (numAssignableEngineers >= numServicesSelected)
+                    break;
             }
 
             // Hall's Theorem
