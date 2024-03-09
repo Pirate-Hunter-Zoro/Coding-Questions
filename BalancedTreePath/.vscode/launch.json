@@ -6,11 +6,18 @@
     "configurations": [
         {
             "type": "java",
-            "name": "BalancedTreePath",
+            "name": "BalancedTreePathFile",
             "request": "launch",
             "mainClass": "BalancedTreePath",
             "projectName": "BalancedTreePath_2c611d8",
-            "args": "data/secret/024-heapstack.in"
+            "args": "data/secret/085-starrandom.in"
+        },
+        {
+            "type": "java",
+            "name": "BalancedTreePathNoFile",
+            "request": "launch",
+            "mainClass": "BalancedTreePath",
+            "projectName": "BalancedTreePath_2c611d8",
         }
     ]
 }
