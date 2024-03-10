@@ -45,7 +45,7 @@ Link:
 https://leetcode.com/problems/maximum-twin-sum-of-a-linked-list/description/
 */
 func pairSum(head *ListNode) int {
-    nodes := make(map[int]*ListNode)
+	nodes := make(map[int]*ListNode)
 	current := head
 	idx := 0
 	for current != nil {
@@ -56,10 +56,62 @@ func pairSum(head *ListNode) int {
 	sum := 0
 	left, right := 0, idx-1
 	for left < right {
-		sum = int(math.Max(float64(sum), float64(nodes[left].Val) + float64(nodes[right].Val)))
+		sum = int(math.Max(float64(sum), float64(nodes[left].Val)+float64(nodes[right].Val)))
 		left++
 		right--
 	}
 
 	return sum
+}
+
+func generateMatrix(n int) [][]int {
+
+	to_return := make([][]int, n)
+	for i := 0; i < n; i++ {
+		to_return[i] = make([]int, n)
+	}
+	to_return[0][0] = 1
+	num_cells := n * n
+
+	row := 0
+	col := 1
+	row_min := 0
+	row_max := n - 1
+	col_min := 0
+	col_max := n - 1
+	for i := 1; i < num_cells; i++ {
+		if row == row_min && col == col_min { // start a new spiral
+			row++
+			col++
+			to_return[row][col] = i + 1
+			col++
+			row_min++
+			col_min++
+			row_max--
+			col_max--
+		} else {
+			to_return[row][col] = i + 1
+			if col == col_max { // right side
+				if row == row_max { // at bottom, so go left
+					col--
+				} else { // going down
+					row++
+				}
+			} else if row == row_max {
+				if col == col_min { // at left, so go up
+					row--
+				} else { // going left
+					col--
+				}
+			} else if row == row_min { // at top, going right
+				col++
+			} else if col == col_min { // at left, going up
+				row--
+			}
+
+		}
+	}
+
+	return to_return
+
 }
