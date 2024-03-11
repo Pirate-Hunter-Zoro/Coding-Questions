@@ -2,12 +2,15 @@ package src
 
 import (
 	"math"
+	"sort"
 )
 
 type ListNode struct {
 	Val  int
 	Next *ListNode
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
 Given the head of a singly linked list, return the middle node of the linked list.
@@ -32,6 +35,8 @@ func middleNode(head *ListNode) *ListNode {
 	}
 	return current
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
 In a linked list of size n, where n is even, the ith node (0-indexed) of the linked list is known as the twin of the (n-1-i)th node, if 0 <= i <= (n / 2) - 1.
@@ -64,6 +69,15 @@ func pairSum(head *ListNode) int {
 	return sum
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+*
+Given a positive integer n, generate an n x n matrix filled with elements from 1 to n^2 in spiral order.
+
+Link:
+https://leetcode.com/problems/spiral-matrix-ii/description/
+*/
 func generateMatrix(n int) [][]int {
 
 	to_return := make([][]int, n)
@@ -114,4 +128,34 @@ func generateMatrix(n int) [][]int {
 
 	return to_return
 
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given two strings order and s. All the characters of order are unique and were sorted in some custom order previously.
+
+Permute the characters of s so that they match the order that order was sorted. More specifically, if a character x occurs before a character y in order, then x should occur before y in the permuted string.
+
+Return any permutation of s that satisfies this property.
+
+Link:
+https://leetcode.com/problems/custom-sort-string/description/?envType=daily-question&envId=2024-03-11
+*/
+func customSorting(order string, s string) string {
+	orderings := make(map[byte]int)
+	for i := 0; i < len(order); i++ {
+		orderings[order[i]] = i
+	}
+
+	s_chars := make([]byte, len(s))
+	for i := 0; i < len(s); i++ {
+		s_chars[i] = s[i]
+	}
+
+	sort.SliceStable(s_chars, func(idx_1, idx_2 int) bool {
+		return orderings[s_chars[idx_1]] < orderings[s_chars[idx_2]]
+	})
+
+	return string(s_chars)
 }
