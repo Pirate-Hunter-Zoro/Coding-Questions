@@ -1,6 +1,6 @@
-from TreeNode import TreeNode
+from tree_node import tree_node
 
-class CBTInserter(object):
+class cbt_inserter(object):
     """_summary_
 
     Args:
@@ -55,9 +55,9 @@ class CBTInserter(object):
         """
         addChild = self.current_level[self.add_children_index]
         if addChild.left == None:
-            addChild.left = TreeNode(val)
+            addChild.left = tree_node(val)
         else:
-            addChild.right = TreeNode(val)
+            addChild.right = tree_node(val)
             self.add_children_index += 1
             if self.add_children_index >= len(self.current_level):
                 next_level = []
@@ -74,7 +74,7 @@ class CBTInserter(object):
         """
         return self.root
 
-root = TreeNode.make_node([1, 2, 3, 4, 5, 6])
-inserter = CBTInserter(root)
+root = tree_node.make_node([1, 2, 3, 4, 5, 6])
+inserter = cbt_inserter(root)
 inserter.insert(7)
 inserter.insert(8)

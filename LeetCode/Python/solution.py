@@ -1,10 +1,10 @@
 from collections import defaultdict
 import copy
 import math
-from TreeNode import TreeNode
+from tree_node import tree_node
 
 
-class Solution(object):
+class solution(object):
     factorial_sols = [defaultdict(int) for _ in range(1001)]
 
     @staticmethod
@@ -12,36 +12,36 @@ class Solution(object):
         if k > n:
             return 0
 
-        if Solution.factorial_sols[n][k] == 0:
+        if solution.factorial_sols[n][k] == 0:
             if k == 0 or k == n:
-                Solution.factorial_sols[n][k] = 1
+                solution.factorial_sols[n][k] = 1
             else:
-                Solution.factorial_sols[n][k] = Solution.choose(
+                solution.factorial_sols[n][k] = solution.choose(
                     n - 1, k - 1
-                ) + Solution.choose(n - 1, k)
+                ) + solution.choose(n - 1, k)
 
-        return Solution.factorial_sols[n][k]
+        return solution.factorial_sols[n][k]
 
     mod = 1000000007
 
     @staticmethod
     def modularAdd(n1, n2):
-        return ((n1 % Solution.mod) + (n2 % Solution.mod)) % Solution.mod
+        return ((n1 % solution.mod) + (n2 % solution.mod)) % solution.mod
 
     @staticmethod
     def modularSubtract(n1, n2):
-        first = n1 % Solution.mod
-        second = n2 % Solution.mod
+        first = n1 % solution.mod
+        second = n2 % solution.mod
         if first >= second:
-            return (first - second) % Solution.mod
+            return (first - second) % solution.mod
         else:
             return (
-                (first % Solution.mod) + (Solution.mod - (second % Solution.mod))
-            ) % Solution.mod
+                (first % solution.mod) + (solution.mod - (second % solution.mod))
+            ) % solution.mod
 
     @staticmethod
     def modularMultiply(n1, n2):
-        return ((n1 % Solution.mod) * (n2 % Solution.mod)) % Solution.mod
+        return ((n1 % solution.mod) * (n2 % solution.mod)) % solution.mod
 
     """
     --------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ class Solution(object):
             for diff in differences:
                 sequences += sols[i][diff]
 
-        return sequences - Solution.choose(len(nums), 2)
+        return sequences - solution.choose(len(nums), 2)
 
     """
     --------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -123,12 +123,12 @@ class Solution(object):
 
         unique_chars = copy.deepcopy(dp)
 
-        Solution.top_down_count_palindromes(
+        solution.top_down_count_palindromes(
             0, len(s) - 1, s, dp, unique_chars, outermost_pairs
         )
 
         # Do not count the empty sequence
-        return Solution.modularSubtract(dp[0][len(s) - 1], 1)
+        return solution.modularSubtract(dp[0][len(s) - 1], 1)
 
     @staticmethod
     def top_down_count_palindromes(start, end, s, dp, unique_chars, outermost_pairs):
@@ -144,19 +144,19 @@ class Solution(object):
                 dp[start][end] = 3
             else:
                 # First count the number of unique characters
-                total = Solution.num_unique_chars(s, start, end, unique_chars)
+                total = solution.num_unique_chars(s, start, end, unique_chars)
 
                 # Simply find all nested, outermost occuring pairs - inner_start, inner_end
                 inner_palindromes = 0
                 for char in ["a", "b", "c", "d"]:
-                    inner_start, inner_end = Solution.outermost_pair(
+                    inner_start, inner_end = solution.outermost_pair(
                         s, start, end, char, outermost_pairs
                     )
                     # All inner palindromes are of the form 'a*a' (or 'b*b', etc.), as long as we have two different 'a' indices then approach that subproblem in between to yield all possible '*'
                     if inner_end > inner_start:
-                        inner_palindromes = Solution.modularAdd(
+                        inner_palindromes = solution.modularAdd(
                             inner_palindromes,
-                            Solution.top_down_count_palindromes(
+                            solution.top_down_count_palindromes(
                                 inner_start + 1,
                                 inner_end - 1,
                                 s,
@@ -166,10 +166,10 @@ class Solution(object):
                             ),
                         )
 
-                total = Solution.modularAdd(total, inner_palindromes)
+                total = solution.modularAdd(total, inner_palindromes)
 
                 # Also count the empty sequence
-                total = Solution.modularAdd(total, 1)
+                total = solution.modularAdd(total, 1)
 
                 # Store our solution
                 dp[start][end] = total
@@ -200,15 +200,15 @@ class Solution(object):
                 if s[start] == char and s[end] == char:
                     outermost_pairs[char][start][end] = (start, end)
                 elif s[start] == char:  # No point in moving up start
-                    outermost_pairs[char][start][end] = Solution.outermost_pair(
+                    outermost_pairs[char][start][end] = solution.outermost_pair(
                         s, start, end - 1, char, outermost_pairs
                     )
                 elif s[end] == char:  # No point in moving down end
-                    outermost_pairs[char][start][end] = Solution.outermost_pair(
+                    outermost_pairs[char][start][end] = solution.outermost_pair(
                         s, start + 1, end, char, outermost_pairs
                     )
                 else:  # Need to move up both
-                    outermost_pairs[char][start][end] = Solution.outermost_pair(
+                    outermost_pairs[char][start][end] = solution.outermost_pair(
                         s, start + 1, end - 1, char, outermost_pairs
                     )
             else:
@@ -262,7 +262,7 @@ class Solution(object):
         best = max_possible
         while min_possible <= max_possible:
             sum_goal = int((min_possible + max_possible) / 2)
-            if Solution.can_achieve_less_than_or_equal(sum_goal, nums, k):
+            if solution.can_achieve_less_than_or_equal(sum_goal, nums, k):
                 # try to do better
                 best = sum_goal
                 max_possible = sum_goal - 1
@@ -511,4 +511,4 @@ class Solution(object):
         
 
 flights = [[0, 1, 100], [1, 2, 100], [2, 0, 100], [1, 3, 600], [2, 3, 200]]
-print(Solution().findCheapestPrice(4, flights, 0, 3, 1))
+print(solution().findCheapestPrice(4, flights, 0, 3, 1))

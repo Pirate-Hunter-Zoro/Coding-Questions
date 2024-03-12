@@ -1,14 +1,10 @@
-package src
+package solution
 
 import (
 	"math"
 	"sort"
+	"leetcode/list_node"
 )
-
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -19,7 +15,7 @@ If there are two middle nodes, return the second middle node.
 Link:
 https://leetcode.com/problems/middle-of-the-linked-list/description/?envType=daily-question&envId=2024-03-07
 */
-func middleNode(head *ListNode) *ListNode {
+func MiddleNode(head *list_node.ListNode) *list_node.ListNode {
 	count := 0.0
 	current := head
 	for current != nil {
@@ -49,8 +45,8 @@ Given the head of a linked list with even length, return the maximum twin sum of
 Link:
 https://leetcode.com/problems/maximum-twin-sum-of-a-linked-list/description/
 */
-func pairSum(head *ListNode) int {
-	nodes := make(map[int]*ListNode)
+func PairSum(head *list_node.ListNode) int {
+	nodes := make(map[int]*list_node.ListNode)
 	current := head
 	idx := 0
 	for current != nil {
@@ -78,7 +74,7 @@ Given a positive integer n, generate an n x n matrix filled with elements from 1
 Link:
 https://leetcode.com/problems/spiral-matrix-ii/description/
 */
-func generateMatrix(n int) [][]int {
+func GenerateMatrix(n int) [][]int {
 
 	to_return := make([][]int, n)
 	for i := 0; i < n; i++ {
@@ -142,7 +138,7 @@ Return any permutation of s that satisfies this property.
 Link:
 https://leetcode.com/problems/custom-sort-string/description/?envType=daily-question&envId=2024-03-11
 */
-func customSorting(order string, s string) string {
+func CustomSorting(order string, s string) string {
 	orderings := make(map[byte]int)
 	for i := 0; i < len(order); i++ {
 		orderings[order[i]] = i
@@ -158,4 +154,97 @@ func customSorting(order string, s string) string {
 	})
 
 	return string(s_chars)
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+*
+Given the head of a linked list, we repeatedly delete consecutive sequences of nodes that sum to 0 until there are no such sequences.
+
+After doing so, return the head of the final linked list.  You may return any such answer.
+
+Link:
+https://leetcode.com/problems/remove-zero-sum-consecutive-nodes-from-linked-list/description/?envType=daily-question&envId=2024-03-12
+*/
+func RemoveZeroSumSublists(head *list_node.ListNode) *list_node.ListNode {
+	if head.Next == nil {
+		if head.Val == 0 {
+			return nil
+		}
+		return head
+	}
+
+	// Get instant access for each node value
+	count := 0
+	current := head
+	for current != nil {
+		count++
+		current = current.Next
+	}
+	vals := make([]int, count)
+	nodes := make([]*list_node.ListNode, count)
+	count = 0
+	current = head
+	for current != nil {
+		nodes[count] = current
+		vals[count] = current.Val
+		count++
+		current = current.Next
+	}
+
+	// Otherwise we have some work to do
+	sums := make([][]int, count)
+	for i := 0; i < count; i++ {
+		sums[i] = make([]int, count)
+	}
+
+	for i := 0; i < count; i++ {
+		sums[i][i] = vals[i]
+	}
+	for row := 0; row < count; row++ {
+		for col := row+1; col < count; col++ {
+			sums[row][col] = sums[row][col-1] + vals[col]
+		}
+	}
+
+	// WLOG, we can find the greatest length 0 sequence starting at index 0, find where it ends, and repeat for whatever precedes the ending index, etc.
+	prev_end := -1
+	start := 0
+	current_head := head
+	for start < count {
+		found_zero_sum := false
+		end := count - 1
+		for end >= start {
+			if sums[start][end] == 0 {
+				found_zero_sum = true
+				if nodes[start] == current_head {
+					if end == count-1 {
+						return nil
+					} else {
+						start = end + 1
+						end = count - 1
+						current_head = nodes[start]
+					}
+				} else {
+					if end == count-1 {
+						nodes[prev_end].Next = nil
+						return current_head
+					} else {
+						start = end + 1
+						end = count - 1
+						nodes[prev_end].Next = nodes[start]
+					}
+				}
+				break
+			}
+			end--
+		}
+		if !found_zero_sum {
+			prev_end = start
+			start++
+		}
+	}
+
+	return current_head
 }

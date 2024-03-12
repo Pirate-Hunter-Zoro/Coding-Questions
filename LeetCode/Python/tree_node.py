@@ -1,4 +1,4 @@
-class TreeNode(object):
+class tree_node(object):
     def __init__(self, val=0, left=None, right=None):
         self.val = val
         self.left = left
@@ -6,14 +6,14 @@ class TreeNode(object):
 
     @staticmethod
     def make_node(val_list: list[int]):
-        root = TreeNode(val_list[0])
+        root = tree_node(val_list[0])
         idx = 1
         node_map = {}
         node_map[0] = root
         for i in range(1, len(val_list)):
             v = val_list[i]
             if v is not None:
-                node_map[i] = TreeNode(v)
+                node_map[i] = tree_node(v)
 
         parent_index = 0
         while idx < len(val_list) and parent_index < len(val_list):
