@@ -45,3 +45,36 @@ func TestRemoveZeroSum(t *testing.T) {
 			current.Val, len(expected))
 	}
 }
+
+func TestCountSubarraysWithSum(t *testing.T) {
+	nums := []int{1, 0, 1, 0, 1}
+
+	v := solution.NumSubArraysWithSum(nums, 2)
+	if v != 4 {
+		t.Fatalf("Expected 4 - got %d", v)
+	}
+
+	nums = []int{0, 0, 0, 0, 0}
+	v = solution.NumSubArraysWithSum(nums, 0)
+	if v != 15 {
+		t.Fatalf("Expected 15 - got %d", v)
+	}
+
+	nums = []int{0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0}
+	v = solution.NumSubArraysWithSum(nums, 5)
+	if v != 10 {
+		t.Fatalf("Expected 10 - got %d", v)
+	}
+
+	nums = []int{0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0}
+	v = solution.NumSubArraysWithSum(nums, 3)
+	if v != 48 {
+		t.Fatalf("Expected 48 - got %d", v)
+	}
+
+	nums = []int{1,0,0,0,0,0,0,0,0,0}
+	v = solution.NumSubArraysWithSum(nums, 1)
+	if v != 10 {
+		t.Fatalf("Expected 10 - got %d", v)
+	}
+}

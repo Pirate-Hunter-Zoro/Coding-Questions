@@ -1,9 +1,9 @@
 package solution
 
 import (
+	"leetcode/list_node"
 	"math"
 	"sort"
-	"leetcode/list_node"
 )
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ func RemoveZeroSumSublists(head *list_node.ListNode) *list_node.ListNode {
 		sums[i][i] = vals[i]
 	}
 	for row := 0; row < count; row++ {
-		for col := row+1; col < count; col++ {
+		for col := row + 1; col < count; col++ {
 			sums[row][col] = sums[row][col-1] + vals[col]
 		}
 	}
@@ -247,4 +247,90 @@ func RemoveZeroSumSublists(head *list_node.ListNode) *list_node.ListNode {
 	}
 
 	return current_head
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a binary array nums and an integer goal, return the number of non-empty subarrays with a sum goal.
+
+A subarray is a contiguous part of the array.
+
+Link:
+https://leetcode.com/problems/binary-subarrays-with-sum/description/?envType=daily-question&envId=2024-03-14
+*/
+func NumSubArraysWithSum(nums []int, goal int) int {
+	// Handle zero separately
+	if goal == 0 {
+		count := 0
+		left := 0
+		for left < len(nums) && nums[left] == 1 {
+			left++
+		}
+		right := left
+		for right < len(nums) {
+			if nums[right] == 0 {
+				count += right - left + 1
+				right++
+			} else {
+				for right < len(nums) && nums[right] == 1 {
+					right++
+				}
+				left = right
+			}
+		}
+
+		return count
+	}
+
+	// we KNOW the sum goal is greater than 0
+	left := 0
+	right := 0
+	sum := nums[0]
+	count := 0
+	// progress until we hit our goal, and move up left until it hits a 1
+	for right < len(nums) && sum < goal {
+		right++
+		if right >= len(nums) {
+			break
+		}
+		sum += nums[right]
+	}
+	if sum < goal { // not possible to reach goal
+		return 0
+	}
+	// otherwise, it was possible to reach the goal - move up left until it hits a 1
+	for nums[left] == 0 {
+		left++
+	}
+
+	// at each restart of the following loop, nums[left] == 1 AND nums[right] == 1, and we need to count how many consecutive zeros lie left, and how many consecutive zeros lie right
+	for right < len(nums) {
+		zeros_left := 0
+		left_scanner := left-1
+		for left_scanner >= 0 && nums[left_scanner] == 0 {
+			zeros_left++
+			left_scanner--
+		}
+
+		zeros_right := 0
+		right_scanner := right+1
+		for right_scanner < len(nums) && nums[right_scanner] == 0 {
+			zeros_right++
+			right_scanner++
+		}
+		
+		count += (zeros_left + 1) * (zeros_right + 1)
+		
+		left++
+		for left < len(nums) && nums[left] == 0 {
+			left++
+		}
+		right++
+		for right < len(nums) && nums[right] == 0 {
+			right++
+		}
+	}
+
+	return count
 }
