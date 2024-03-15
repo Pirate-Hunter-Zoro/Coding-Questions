@@ -393,6 +393,12 @@ Return the minimum difference possible between the sums of the two parts after t
 
 Link:
 https://leetcode.com/problems/minimum-difference-in-sums-after-removal-of-elements/description/
+
+Inspiration:
+https://leetcode.com/problems/minimum-difference-in-sums-after-removal-of-elements/solutions/1747029/python-explanation-with-pictures-priority-queue/
+
+User Who Gave Inspiration:
+https://leetcode.com/Bakerston/
 */
 func MinimumDifference(nums []int) int64 {
 	n := len(nums) / 3
