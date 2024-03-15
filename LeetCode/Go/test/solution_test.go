@@ -72,9 +72,23 @@ func TestCountSubarraysWithSum(t *testing.T) {
 		t.Fatalf("Expected 48 - got %d", v)
 	}
 
-	nums = []int{1,0,0,0,0,0,0,0,0,0}
+	nums = []int{1, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	v = solution.NumSubArraysWithSum(nums, 1)
 	if v != 10 {
 		t.Fatalf("Expected 10 - got %d", v)
+	}
+}
+
+func TestMinimumDifference(t *testing.T) {
+	nums := []int{3, 1, 2}
+	v := solution.MinimumDifference(nums)
+	if v != int64(-1) {
+		t.Fatalf("Expected -1 - got %d", v)
+	}
+
+	nums = []int{7, 9, 5, 8, 1, 3}
+	v = solution.MinimumDifference(nums)
+	if v != int64(1) {
+		t.Fatalf("Expected 1 - got %d", v)
 	}
 }

@@ -1,6 +1,7 @@
 package solution
 
 import (
+	"leetcode/heap"
 	"leetcode/list_node"
 	"math"
 	"sort"
@@ -307,21 +308,21 @@ func NumSubArraysWithSum(nums []int, goal int) int {
 	// at each restart of the following loop, nums[left] == 1 AND nums[right] == 1, and we need to count how many consecutive zeros lie left, and how many consecutive zeros lie right
 	for right < len(nums) {
 		zeros_left := 0
-		left_scanner := left-1
+		left_scanner := left - 1
 		for left_scanner >= 0 && nums[left_scanner] == 0 {
 			zeros_left++
 			left_scanner--
 		}
 
 		zeros_right := 0
-		right_scanner := right+1
+		right_scanner := right + 1
 		for right_scanner < len(nums) && nums[right_scanner] == 0 {
 			zeros_right++
 			right_scanner++
 		}
-		
+
 		count += (zeros_left + 1) * (zeros_right + 1)
-		
+
 		left++
 		for left < len(nums) && nums[left] == 0 {
 			left++
@@ -333,4 +334,114 @@ func NumSubArraysWithSum(nums []int, goal int) int {
 	}
 
 	return count
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i].
+
+The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit integer.
+
+You must write an algorithm that runs in O(n) time and without using the division operation.
+
+Link:
+https://leetcode.com/problems/product-of-array-except-self/description/?envType=daily-question&envId=2024-03-15
+*/
+func ProductExceptSelf(nums []int) []int {
+	sols := make([]int, len(nums))
+	prod := 1
+	num_zeros := 0
+	for i := 0; i < len(nums); i++ {
+		if nums[i] != 0 {
+			prod *= nums[i]
+		} else {
+			num_zeros++
+			if num_zeros > 1 {
+				return sols
+			}
+		}
+	}
+	for i := 0; i < len(nums); i++ {
+		if nums[i] != 0 {
+			if num_zeros == 0 {
+				sols[i] = prod / nums[i]
+			}
+		} else {
+			sols[i] = prod
+		}
+	}
+
+	return sols
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+*
+You are given a 0-indexed integer array nums consisting of 3 * n elements.
+
+You are allowed to remove any subsequence of elements of size exactly n from nums. The remaining 2 * n elements will be divided into two equal parts:
+
+The first n elements belonging to the first part and their sum is sumfirst.
+The next n elements belonging to the second part and their sum is sumsecond.
+The difference in sums of the two parts is denoted as sumfirst - sumsecond.
+
+For example, if sumfirst = 3 and sumsecond = 2, their difference is 1.
+Similarly, if sumfirst = 2 and sumsecond = 3, their difference is -1.
+Return the minimum difference possible between the sums of the two parts after the removal of n elements.
+
+Link:
+https://leetcode.com/problems/minimum-difference-in-sums-after-removal-of-elements/description/
+*/
+func MinimumDifference(nums []int) int64 {
+	n := len(nums) / 3
+
+	min_sum_left := int64(0)
+	left_heap := heap.MaxHeap{}
+	for i := 0; i < n; i++ {
+		left_heap.Insert(nums[i])
+		min_sum_left += int64(nums[i])
+	}
+
+	max_sum_right := int64(0)
+	right_heap := heap.MinHeap{}
+	for i := 2 * n; i < 3*n; i++ {
+		right_heap.Insert(nums[i])
+		max_sum_right += int64(nums[i])
+	}
+
+	left_sums := make([]int64, n+1) // left_sums[i] is the minimum sum of n numbers achievable in nums[0:n+i-1]
+	left_sums[0] = min_sum_left
+	right_sums := make([]int64, n+1) // right_sums[i] is the maximum sum of n numbers achievable in nums[n+i:3n-1]
+	right_sums[n] = max_sum_right
+	for i := 1; i <= n; i++ {
+		// handle left
+		next_left := nums[n+i-1]
+		if left_heap.Peek() > next_left {
+			v := left_heap.Extract()
+			left_heap.Insert(next_left)
+			min_sum_left -= int64(v)
+			min_sum_left += int64(next_left)
+		}
+		left_sums[i] = min_sum_left
+
+		// handle right
+		next_right := nums[2*n-i]
+		if right_heap.Peek() < next_right {
+			v := right_heap.Extract()
+			right_heap.Insert(next_right)
+			max_sum_right -= int64(v)
+			max_sum_right += int64(next_right)
+		}
+		right_sums[n-i] = max_sum_right
+	}
+
+	record := left_sums[0] - right_sums[0]
+	for i := 1; i < len(left_sums); i++ {
+		record = min(record, left_sums[i]-right_sums[i])
+	}
+
+	return record
+
 }
