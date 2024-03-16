@@ -451,3 +451,38 @@ func MinimumDifference(nums []int) int64 {
 	return record
 
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+*
+Given a binary array nums, return the maximum length of a contiguous subarray with an equal number of 0 and 1.
+
+Link:
+https://leetcode.com/problems/contiguous-array/description/?envType=daily-question&envId=2024-03-16
+
+Editorial:
+https://leetcode.com/problems/contiguous-array/editorial/?envType=daily-question&envId=2024-03-16
+*/
+func FindMaxLength(nums []int) int {
+	total := 0
+	counts := make(map[int]int)
+	counts[0] = -1
+	record := 0
+	for i := 0; i < len(nums); i++ {
+		if nums[i] == 0 {
+			total--
+		} else {
+			total++
+		}
+		earliest_occurence, key_present := counts[total]
+		if key_present {
+			length := i - earliest_occurence
+			record = max(record, length)
+		} else {
+			counts[total] = i
+		}
+	}
+
+	return record
+}
