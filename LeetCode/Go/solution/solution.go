@@ -224,7 +224,6 @@ func RemoveZeroSumSublists(head *list_node.ListNode) *list_node.ListNode {
 						return nil
 					} else {
 						start = end + 1
-						end = count - 1
 						current_head = nodes[start]
 					}
 				} else {
@@ -233,7 +232,6 @@ func RemoveZeroSumSublists(head *list_node.ListNode) *list_node.ListNode {
 						return current_head
 					} else {
 						start = end + 1
-						end = count - 1
 						nodes[prev_end].Next = nodes[start]
 					}
 				}
