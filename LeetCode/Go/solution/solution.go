@@ -486,3 +486,36 @@ func FindMaxLength(nums []int) int {
 
 	return record
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+There are some spherical balloons taped onto a flat wall that represents the XY-plane. The balloons are represented as a 2D integer array points where points[i] = [xstart, xend] denotes a balloon whose horizontal diameter stretches between xstart and xend. You do not know the exact y-coordinates of the balloons.
+
+Arrows can be shot up directly vertically (in the positive y-direction) from different points along the x-axis. A balloon with xstart and xend is burst by an arrow shot at x if xstart <= x <= xend. There is no limit to the number of arrows that can be shot. A shot arrow keeps traveling up infinitely, bursting any balloons in its path.
+
+Given the array points, return the minimum number of arrows that must be shot to burst all balloons.
+
+Link:
+https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/description/?envType=daily-question&envId=2024-03-18*/
+func FindMinArrowShots(points [][]int) int {
+	sort.SliceStable(points, func(idx_1, idx_2 int) bool {
+		return points[idx_1][1] < points[idx_2][1]
+	})
+	// Essentially, shoot an arrow at the ends of all these balloons
+
+	arrows := 0
+	prev_end := math.MinInt
+	i := 0
+	for i < len(points) {
+		for i < len(points) && points[i][0] <= prev_end {
+			i++
+		}
+		if i < len(points) {
+			arrows++
+			prev_end = points[i][1]
+		}
+	}
+
+	return arrows
+}
