@@ -495,7 +495,8 @@ Arrows can be shot up directly vertically (in the positive y-direction) from dif
 Given the array points, return the minimum number of arrows that must be shot to burst all balloons.
 
 Link:
-https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/description/?envType=daily-question&envId=2024-03-18*/
+https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/description/?envType=daily-question&envId=2024-03-18
+*/
 func FindMinArrowShots(points [][]int) int {
 	sort.SliceStable(points, func(idx_1, idx_2 int) bool {
 		return points[idx_1][1] < points[idx_2][1]
@@ -516,4 +517,22 @@ func FindMinArrowShots(points [][]int) int {
 	}
 
 	return arrows
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+A super ugly number is a positive integer whose prime factors are in the array primes.
+
+Given an integer n and an array of integers primes, return the nth super ugly number.
+
+The nth super ugly number is guaranteed to fit in a 32-bit signed integer.
+
+Link:
+https://leetcode.com/problems/super-ugly-number/description/
+*/
+func NthSuperUglyNumber(n int, primes []int) int {
+	
+
+	return 0
 }
