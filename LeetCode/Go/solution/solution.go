@@ -532,7 +532,9 @@ Link:
 https://leetcode.com/problems/super-ugly-number/description/
 */
 func NthSuperUglyNumber(n int, primes []int) int {
-	
+	sort.SliceStable(primes, func(idx_1, idx_2 int) bool{
+		return primes[idx_1] < primes[idx_2]
+	})
 
 	return 0
 }
