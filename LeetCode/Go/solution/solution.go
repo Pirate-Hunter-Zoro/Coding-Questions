@@ -604,21 +604,24 @@ func LeastInterval(tasks []byte, n int) int {
 		max_count := math.MinInt
 		min_nonzero_cooldown := math.MaxInt // will be useful later
 		// Find the task with zero cooldown of the highest count
-		zero_cooldown_found := false
-		multiple_zero_cooldown_found := false
+		task_remaining_with_zero_cooldown := false
 		for task, cooldown := range cooldown_left {
 			if cooldown == 0 {
+				if max_count > math.MinInt {
+					// This is not the first zero cooldown task we have seen
+					task_remaining_with_zero_cooldown = true
+				}
 				if counts[task] > max_count {
-					if zero_cooldown_found {
-						multiple_zero_cooldown_found = true
-					} else {
-						zero_cooldown_found = true
-					}
 					schedule_this = task
 					max_count = counts[task]
 				}
 			} else {
-				min_nonzero_cooldown = min(min_nonzero_cooldown, cooldown)
+				cooldown_left[task]--
+				if cooldown_left[task] == 0 {
+					task_remaining_with_zero_cooldown = true
+				} else {
+					min_nonzero_cooldown = min(min_nonzero_cooldown, cooldown_left[task])
+				}
 			}
 		}
 		tasks_scheduled++
@@ -631,7 +634,7 @@ func LeastInterval(tasks []byte, n int) int {
 			min_nonzero_cooldown = min(min_nonzero_cooldown, n)
 		}
 
-		if !multiple_zero_cooldown_found {
+		if !task_remaining_with_zero_cooldown && tasks_scheduled < len(tasks) {
 			for task := range cooldown_left {
 				cooldown_left[task] -= min_nonzero_cooldown
 			}

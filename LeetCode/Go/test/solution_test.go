@@ -143,4 +143,18 @@ func TestLeastInterval(t *testing.T) {
 	if v != 8 {
 		t.Fatalf("Expected 8 - got %d", v)
 	}
+
+	tasks = []byte{65, 67, 65, 66, 68, 66}
+	n = 1
+	v = solution.LeastInterval(tasks, n)
+	if v != 6 {
+		t.Fatalf("Expected 6 - got %d", v)
+	}
+
+	tasks = []byte{65, 65, 65, 66, 66, 66}
+	n = 3
+	v = solution.LeastInterval(tasks, n)
+	if v != 10 {
+		t.Fatalf("Expected 8 - got %d", v)
+	}
 }
