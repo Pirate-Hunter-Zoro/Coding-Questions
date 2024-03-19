@@ -120,9 +120,27 @@ func TestFindMaxLength(t *testing.T) {
 }
 
 func TestFindMindArrowShots(t *testing.T) {
-	nums := [][]int{{10,16},{2,8},{1,6},{7,12}}
+	nums := [][]int{{10, 16}, {2, 8}, {1, 6}, {7, 12}}
 	v := solution.FindMinArrowShots(nums)
 	if v != 2 {
 		t.Fatalf("Expected 2 - got %d", v)
+	}
+}
+
+func TestNthSuperUglyNumber(t *testing.T) {
+	primes := []int{2, 7, 13, 19}
+	n := 12
+	v := solution.NthSuperUglyNumber(n, primes)
+	if v != 32 {
+		t.Fatalf("Expected 32 - got %d", v)
+	}
+}
+
+func TestLeastInterval(t *testing.T) {
+	tasks := []byte{65, 65, 65, 66, 66, 66}
+	n := 2
+	v := solution.LeastInterval(tasks, n)
+	if v != 8 {
+		t.Fatalf("Expected 8 - got %d", v)
 	}
 }

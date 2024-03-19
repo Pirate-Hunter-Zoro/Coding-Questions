@@ -522,7 +522,7 @@ func FindMinArrowShots(points [][]int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-A super ugly number is a positive integer whose prime factors are in the array primes.
+A super ugly number is a positive integer whose prime factors are in the (sorted) array primes.
 
 Given an integer n and an array of integers primes, return the nth super ugly number.
 
@@ -532,9 +532,112 @@ Link:
 https://leetcode.com/problems/super-ugly-number/description/
 */
 func NthSuperUglyNumber(n int, primes []int) int {
-	sort.SliceStable(primes, func(idx_1, idx_2 int) bool{
-		return primes[idx_1] < primes[idx_2]
-	})
 
-	return 0
+	// The 'index' of the most recent super ugly number we have reached
+	k := 1
+	// The value of the most recent super ugly number we have reached
+	kth_super_ugly := 1
+
+	prime_heaps := make([]heap.MinHeap, len(primes))
+	for i := 0; i < len(primes); i++ {
+		prime_heaps[i] = heap.MinHeap{}
+		prime_heaps[i].Insert(1)
+	}
+
+	for k < n {
+		lowest := math.MaxInt
+		idx := -1
+		// Peek from each heap, and see how small multiplying said value by the heap's prime number would be
+		for i := 0; i < len(prime_heaps); i++ {
+			v := prime_heaps[i].Peek() * primes[i]
+			if v < lowest {
+				idx = i
+				lowest = v
+			}
+		}
+		// Pop whichever value corresponds to the lowest new value
+		// That new value is the next super ugly number
+		// Throw it into all your heaps
+		k++
+		kth_super_ugly = prime_heaps[idx].Extract() * primes[idx]
+		for i := idx; i < len(prime_heaps); i++ {
+			// Start at 'idx'; not zero, to avoid repeats
+			prime_heaps[i].Insert(kth_super_ugly)
+		}
+	}
+
+	return kth_super_ugly
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an array of CPU tasks, each represented by letters A to Z, and a cooling time, n. Each cycle or interval allows the completion of one task. Tasks can be completed in any order, but there's a constraint: identical tasks must be separated by at least n intervals due to cooling time.
+
+​Return the minimum number of intervals required to complete all tasks.
+
+Link:
+https://leetcode.com/problems/task-scheduler/description/?envType=daily-question&envId=2024-03-19
+*/
+func LeastInterval(tasks []byte, n int) int {
+	cooldown_left := make(map[byte]int)
+	counts := make(map[byte]int)
+
+	intervals := 0
+	for i := 0; i < len(tasks); i++ {
+		v, present := counts[tasks[i]]
+		if !present {
+			counts[tasks[i]] = 1
+		} else {
+			counts[tasks[i]] = v + 1
+		}
+	}
+	for task := range counts {
+		cooldown_left[task] = 0
+	}
+
+	tasks_scheduled := 0
+	// At the beginning of this for loop, at least one task will be cooled down
+	for tasks_scheduled < len(tasks) {
+		intervals++
+		schedule_this := byte(0)
+		max_count := math.MinInt
+		min_nonzero_cooldown := math.MaxInt // will be useful later
+		// Find the task with zero cooldown of the highest count
+		zero_cooldown_found := false
+		multiple_zero_cooldown_found := false
+		for task, cooldown := range cooldown_left {
+			if cooldown == 0 {
+				if counts[task] > max_count {
+					if zero_cooldown_found {
+						multiple_zero_cooldown_found = true
+					} else {
+						zero_cooldown_found = true
+					}
+					schedule_this = task
+					max_count = counts[task]
+				}
+			} else {
+				min_nonzero_cooldown = min(min_nonzero_cooldown, cooldown)
+			}
+		}
+		tasks_scheduled++
+		counts[schedule_this]--
+		if counts[schedule_this] == 0 {
+			delete(counts, schedule_this)
+			delete(cooldown_left, schedule_this)
+		} else {
+			cooldown_left[schedule_this] = n
+			min_nonzero_cooldown = min(min_nonzero_cooldown, n)
+		}
+
+		if !multiple_zero_cooldown_found {
+			for task := range cooldown_left {
+				cooldown_left[task] -= min_nonzero_cooldown
+			}
+			intervals += min_nonzero_cooldown
+		}
+	}
+
+	return intervals
 }
