@@ -644,3 +644,36 @@ func LeastInterval(tasks []byte, n int) int {
 
 	return intervals
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given two linked lists: list1 and list2 of sizes n and m respectively.
+
+Remove list1's nodes from the ath node to the bth node, and put list2 in their place.
+
+Link:
+https://leetcode.com/problems/merge-in-between-linked-lists/description/?envType=daily-question&envId=2024-03-20*/
+func MergeInBetween(list1 *list_node.ListNode, a int, b int, list2 *list_node.ListNode) *list_node.ListNode {
+	idx := 0
+	current := list1
+	for idx < a-1 {
+		idx++
+		current = current.Next
+	}
+	append := current.Next
+	idx = a
+	for idx <= b {
+		append = append.Next
+		idx++
+	}
+
+	current.Next = list2
+	current = list2
+	for current.Next != nil {
+		current = current.Next
+	}
+	current.Next = append
+
+	return list1
+}
