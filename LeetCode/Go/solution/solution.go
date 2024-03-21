@@ -653,7 +653,8 @@ You are given two linked lists: list1 and list2 of sizes n and m respectively.
 Remove list1's nodes from the ath node to the bth node, and put list2 in their place.
 
 Link:
-https://leetcode.com/problems/merge-in-between-linked-lists/description/?envType=daily-question&envId=2024-03-20*/
+https://leetcode.com/problems/merge-in-between-linked-lists/description/?envType=daily-question&envId=2024-03-20
+*/
 func MergeInBetween(list1 *list_node.ListNode, a int, b int, list2 *list_node.ListNode) *list_node.ListNode {
 	idx := 0
 	current := list1
@@ -676,4 +677,117 @@ func MergeInBetween(list1 *list_node.ListNode, a int, b int, list2 *list_node.Li
 	current.Next = append
 
 	return list1
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+There is an integer array nums sorted in ascending order (with distinct values).
+
+Prior to being passed to your function, nums is possibly rotated at an unknown pivot index k (1 <= k < nums.length) such that the resulting array is [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]] (0-indexed). For example, [0,1,2,4,5,6,7] might be rotated at pivot index 3 and become [4,5,6,7,0,1,2].
+
+Given the array nums after the possible rotation and an integer target, return the index of target if it is in nums, or -1 if it is not in nums.
+
+You must write an algorithm with O(log n) runtime complexity.
+
+Link:
+https://leetcode.com/problems/search-in-rotated-sorted-array/description/
+*/
+func Search(nums []int, target int) int {
+	if len(nums) < 3 {
+		if len(nums) < 2 {
+			if nums[0] == target {
+				return 0
+			} else {
+				return -1
+			}
+		} else {
+			if nums[0] == target {
+				return 0
+			} else if nums[1] == target {
+				return 1
+			} else {
+				return -1
+			}
+		}
+	}
+
+	left := 0
+	right := len(nums)
+	pivot := -1
+	// search for the pivot
+	for left < right {
+		mid := (right + left) / 2
+		if mid == len(nums) - 1 || nums[mid] > nums[mid+1] {
+			pivot = mid
+			break
+		} else if mid > 0 && nums[mid-1] > nums[mid] {
+			pivot = mid - 1
+			break
+		} else if nums[mid] > nums[right-1] {
+			// pivot is right of mid
+			left = mid+1
+		} else {
+			// pivot is left of mid
+			right = mid
+		}
+	}
+
+	if pivot == -1 {
+		// binary search  normally
+		left = pivot+1
+		right = len(nums)
+		for left < right {
+			mid := (left + right) / 2
+			if nums[mid] == target {
+				return mid
+			} else if nums[mid] < target {
+				left = mid+1
+			} else {
+				right = mid
+			}
+		}
+		return -1
+	}
+
+	// Otherwise
+	if nums[pivot] == target {
+		return pivot
+	}
+
+	// binary search from pivot + 1 to the end
+	left = pivot+1
+	right = len(nums)
+	for left < right {
+		mid := (left + right) / 2
+		if nums[mid] == target {
+			return mid
+		} else if nums[mid] < target {
+			left = mid+1
+		} else {
+			right = mid
+		}
+	}
+
+	// binary search from start to pivot
+	left = 0
+	right = pivot
+	for left < right {
+		mid := (left + right) / 2
+		if nums[mid] == target {
+			return mid
+		} else if nums[mid] < target {
+			left = mid+1
+		} else {
+			right = mid
+		}
+	}
+
+	return -1
+}
+
+func SearchRepeats(nums []int, target int) int {
+
+
+	return -1
 }

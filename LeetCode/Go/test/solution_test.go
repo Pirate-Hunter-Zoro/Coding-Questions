@@ -158,3 +158,29 @@ func TestLeastInterval(t *testing.T) {
 		t.Fatalf("Expected 8 - got %d", v)
 	}
 }
+
+func TestPivotSearch(t *testing.T) {
+	nums := []int {1,3,5}
+	v := solution.Search(nums, 0)
+	if v != -1 {
+		t.Fatalf("Expected -1, but got %d", v)
+	}
+
+	nums = []int {2,3,4,5,1}
+	v = solution.Search(nums, 1)
+	if v != 4 {
+		t.Fatalf("Expected 4, but got %d", v)
+	}
+
+	nums = []int {2,4,7,9,0}
+	v = solution.Search(nums, 9)
+	if v != 3 {
+		t.Fatalf("Expected 3, but got %d", v)
+	}
+
+	nums = []int {5,7,8,0,3,4}
+	v = solution.Search(nums, 7)
+	if v != 1 {
+		t.Fatalf("Expected 1, but got %d", v)
+	}
+}
