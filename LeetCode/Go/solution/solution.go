@@ -718,7 +718,7 @@ func Search(nums []int, target int) int {
 	// search for the pivot
 	for left < right {
 		mid := (right + left) / 2
-		if mid == len(nums) - 1 || nums[mid] > nums[mid+1] {
+		if mid == len(nums)-1 || nums[mid] > nums[mid+1] {
 			pivot = mid
 			break
 		} else if mid > 0 && nums[mid-1] > nums[mid] {
@@ -726,7 +726,7 @@ func Search(nums []int, target int) int {
 			break
 		} else if nums[mid] > nums[right-1] {
 			// pivot is right of mid
-			left = mid+1
+			left = mid + 1
 		} else {
 			// pivot is left of mid
 			right = mid
@@ -735,14 +735,14 @@ func Search(nums []int, target int) int {
 
 	if pivot == -1 {
 		// binary search  normally
-		left = pivot+1
+		left = pivot + 1
 		right = len(nums)
 		for left < right {
 			mid := (left + right) / 2
 			if nums[mid] == target {
 				return mid
 			} else if nums[mid] < target {
-				left = mid+1
+				left = mid + 1
 			} else {
 				right = mid
 			}
@@ -756,14 +756,14 @@ func Search(nums []int, target int) int {
 	}
 
 	// binary search from pivot + 1 to the end
-	left = pivot+1
+	left = pivot + 1
 	right = len(nums)
 	for left < right {
 		mid := (left + right) / 2
 		if nums[mid] == target {
 			return mid
 		} else if nums[mid] < target {
-			left = mid+1
+			left = mid + 1
 		} else {
 			right = mid
 		}
@@ -777,7 +777,7 @@ func Search(nums []int, target int) int {
 		if nums[mid] == target {
 			return mid
 		} else if nums[mid] < target {
-			left = mid+1
+			left = mid + 1
 		} else {
 			right = mid
 		}
@@ -786,8 +786,19 @@ func Search(nums []int, target int) int {
 	return -1
 }
 
-func SearchRepeats(nums []int, target int) int {
+/*
+There is an integer array nums sorted in non-decreasing order (not necessarily with distinct values).
 
+Before being passed to your function, nums is rotated at an unknown pivot index k (0 <= k < nums.length) such that the resulting array is [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]] (0-indexed). For example, [0,1,2,4,4,4,5,6,6,7] might be rotated at pivot index 5 and become [4,5,6,6,7,0,1,2,4,4].
+
+Given the array nums after the rotation and an integer target, return true if target is in nums, or false if it is not in nums.
+
+You must decrease the overall operation steps as much as possible.
+
+Link:
+https://leetcode.com/problems/search-in-rotated-sorted-array-ii/description/
+*/
+func SearchRepeats(nums []int, target int) int {
 
 	return -1
 }
