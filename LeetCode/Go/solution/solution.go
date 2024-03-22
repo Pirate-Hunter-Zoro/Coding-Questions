@@ -694,60 +694,55 @@ Link:
 https://leetcode.com/problems/search-in-rotated-sorted-array/description/
 */
 func Search(nums []int, target int) int {
-	if len(nums) < 3 {
-		if len(nums) < 2 {
-			if nums[0] == target {
-				return 0
+	return searchPivot(nums, 0, len(nums), target)
+}
+
+/*
+Helper method to search for an integer in nums, which is sorted except for a pivot
+*/
+func searchPivot(nums []int, left int, right int, target int) int {
+	if right - left < 3 {
+		if right - left < 2 {
+			if nums[left] == target {
+				return left
 			} else {
 				return -1
 			}
 		} else {
-			if nums[0] == target {
-				return 0
-			} else if nums[1] == target {
-				return 1
+			if nums[left] == target {
+				return left
+			} else if nums[left+1] == target {
+				return left+1
 			} else {
 				return -1
 			}
 		}
 	}
 
-	left := 0
-	right := len(nums)
+	search_left := left
+	search_right := right
 	pivot := -1
 	// search for the pivot
-	for left < right {
-		mid := (right + left) / 2
+	for search_left < search_right {
+		mid := (search_left + search_right) / 2
 		if mid == len(nums)-1 || nums[mid] > nums[mid+1] {
 			pivot = mid
 			break
 		} else if mid > 0 && nums[mid-1] > nums[mid] {
 			pivot = mid - 1
 			break
-		} else if nums[mid] > nums[right-1] {
+		} else if nums[mid] > nums[search_right-1] {
 			// pivot is right of mid
-			left = mid + 1
+			search_left = mid + 1
 		} else {
 			// pivot is left of mid
-			right = mid
+			search_right = mid
 		}
 	}
 
 	if pivot == -1 {
 		// binary search  normally
-		left = pivot + 1
-		right = len(nums)
-		for left < right {
-			mid := (left + right) / 2
-			if nums[mid] == target {
-				return mid
-			} else if nums[mid] < target {
-				left = mid + 1
-			} else {
-				right = mid
-			}
-		}
-		return -1
+		return binarySearch(nums, left, right, target)
 	}
 
 	// Otherwise
@@ -756,31 +751,15 @@ func Search(nums []int, target int) int {
 	}
 
 	// binary search from pivot + 1 to the end
-	left = pivot + 1
-	right = len(nums)
-	for left < right {
-		mid := (left + right) / 2
-		if nums[mid] == target {
-			return mid
-		} else if nums[mid] < target {
-			left = mid + 1
-		} else {
-			right = mid
-		}
+	idx := binarySearch(nums, pivot+1, right, target)
+	if idx != -1 {
+		return idx
 	}
 
 	// binary search from start to pivot
-	left = 0
-	right = pivot
-	for left < right {
-		mid := (left + right) / 2
-		if nums[mid] == target {
-			return mid
-		} else if nums[mid] < target {
-			left = mid + 1
-		} else {
-			right = mid
-		}
+	idx = binarySearch(nums, left, pivot, target)
+	if idx != -1 {
+		return idx
 	}
 
 	return -1
@@ -798,7 +777,57 @@ You must decrease the overall operation steps as much as possible.
 Link:
 https://leetcode.com/problems/search-in-rotated-sorted-array-ii/description/
 */
-func SearchRepeats(nums []int, target int) int {
+func SearchRepeats(nums []int, target int) bool {
+	if nums[0] == nums[len(nums) - 1] {
+		// then the pivot is in the middle of a bunch of repeats
+		if len(nums) < 3 {
+			if len(nums) < 2 {
+				return nums[0] == target
+			} else {
+				return nums[0] == target || nums[1] == target
+			}
+		}
 
+		v := nums[0]
+		if v == target {
+			return true
+		}
+		left := 1
+		right := len(nums)-1
+		for nums[left] == v && nums[right] == v && left < right {
+			left++
+			right--
+		}
+		if left >= right {
+			return nums[left] == target || nums[right] == target
+		} else {
+			return searchPivot(nums, left, right+1, target) != -1
+		}
+	} else {
+		// then nothing changes from the version of this problem where we did not have repeats
+		if searchPivot(nums, 0, len(nums), target) != -1 {
+			return true
+		} else {
+			return false
+		}
+	}
+}
+
+/*
+Binary search a sorted integer array for a target value from left to right
+NOTE - 'right' is exclusive
+*/
+func binarySearch(nums []int, left int, right int, target int) int {
+	// binary search  normally
+	for left < right {
+		mid := (left + right) / 2
+		if nums[mid] == target {
+			return mid
+		} else if nums[mid] < target {
+			left = mid + 1
+		} else {
+			right = mid
+		}
+	}
 	return -1
 }

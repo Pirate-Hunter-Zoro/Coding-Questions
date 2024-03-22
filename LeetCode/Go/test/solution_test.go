@@ -160,27 +160,57 @@ func TestLeastInterval(t *testing.T) {
 }
 
 func TestPivotSearch(t *testing.T) {
-	nums := []int {1,3,5}
+	nums := []int{1, 3, 5}
 	v := solution.Search(nums, 0)
 	if v != -1 {
 		t.Fatalf("Expected -1, but got %d", v)
 	}
 
-	nums = []int {2,3,4,5,1}
+	nums = []int{2, 3, 4, 5, 1}
 	v = solution.Search(nums, 1)
 	if v != 4 {
 		t.Fatalf("Expected 4, but got %d", v)
 	}
 
-	nums = []int {2,4,7,9,0}
+	nums = []int{2, 4, 7, 9, 0}
 	v = solution.Search(nums, 9)
 	if v != 3 {
 		t.Fatalf("Expected 3, but got %d", v)
 	}
 
-	nums = []int {5,7,8,0,3,4}
+	nums = []int{5, 7, 8, 0, 3, 4}
 	v = solution.Search(nums, 7)
 	if v != 1 {
 		t.Fatalf("Expected 1, but got %d", v)
+	}
+
+	nums = []int{1, 3, 5}
+	v = solution.Search(nums, 1)
+	if v != 0 {
+		t.Fatalf("Expected 0, but got %d", v)
+	}
+
+	nums = []int{2, 5, 6, 0, 0, 1, 2}
+	found := solution.SearchRepeats(nums, 0)
+	if !found {
+		t.Fatalf("Expected %t, but was %t", true, false)
+	}
+
+	nums = []int{2,5,6,0,0,1,2}
+	found = solution.SearchRepeats(nums, 3)
+	if found {
+		t.Fatalf("Expected %t, but was %t", false, true)
+	}
+
+	nums = []int{2,2,2,3,2,2,2}
+	found = solution.SearchRepeats(nums, 3)
+	if !found {
+		t.Fatalf("Expected %t, but was %t", true, false)
+	}
+
+	nums = []int{1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1}
+	found = solution.SearchRepeats(nums, 2)
+	if !found {
+		t.Fatalf("Expected %t, but was %t", true, false)
 	}
 }
