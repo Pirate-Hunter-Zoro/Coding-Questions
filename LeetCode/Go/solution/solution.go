@@ -3,6 +3,7 @@ package solution
 import (
 	"leetcode/heap"
 	"leetcode/list_node"
+	"leetcode/modulo"
 	"math"
 	"sort"
 )
@@ -850,8 +851,8 @@ https://keithschwarz.com/interesting/code/?dir=find-duplicate
 func FindDuplicate(nums []int) int {
 	// This will form a Ro-shaped sequence - we need to find the beginning of the loop
 	n := len(nums) - 1
-	slow := n+1
-	fast := n+1
+	slow := n + 1
+	fast := n + 1
 	slow = nums[slow-1]
 	fast = nums[nums[fast-1]-1]
 
@@ -867,9 +868,9 @@ func FindDuplicate(nums []int) int {
 	// Proof: j > c because it must be in the loop
 	//		  Also, since x_j=x_{2j}, is j iterations must mean we go around the loop a fixed number of times, so j is a multiple of l
 	//		  j is the smallest such multiply of l because any smaller such multiple of l, our above iteration would have hit first
-	
+
 	// Now find the starting point of the loop
-	finder := n+1 // x_0
+	finder := n + 1 // x_0
 	// Also recall slow = x_j
 	// Further, x_{c+j} is equivalent to iterating up to the start of the loop, and progressing around the loop an integer number of times
 	// So you'll end up at the start of the loop after starting at x_0 and going through c+j iterations, and slow has already done j iterations
@@ -880,4 +881,24 @@ func FindDuplicate(nums []int) int {
 	}
 
 	return finder
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer n, your task is to count how many strings of length n can be formed under the following rules:
+
+Each character is a lower case vowel ('a', 'e', 'i', 'o', 'u')
+Each vowel 'a' may only be followed by an 'e'.
+Each vowel 'e' may only be followed by an 'a' or an 'i'.
+Each vowel 'i' may not be followed by another 'i'.
+Each vowel 'o' may only be followed by an 'i' or a 'u'.
+Each vowel 'u' may only be followed by an 'a'.
+Since the answer may be too large, return it modulo 10^9 + 7.
+
+Link:
+https://leetcode.com/problems/count-vowels-permutation/?envType=daily-question&envId=2024-03-24
+*/
+func CountVowelPermutation(n int) int {
+	return modulo.ModularAdd(n, n)
 }
