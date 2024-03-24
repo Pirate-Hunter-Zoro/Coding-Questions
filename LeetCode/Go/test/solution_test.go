@@ -196,21 +196,41 @@ func TestPivotSearch(t *testing.T) {
 		t.Fatalf("Expected %t, but was %t", true, false)
 	}
 
-	nums = []int{2,5,6,0,0,1,2}
+	nums = []int{2, 5, 6, 0, 0, 1, 2}
 	found = solution.SearchRepeats(nums, 3)
 	if found {
 		t.Fatalf("Expected %t, but was %t", false, true)
 	}
 
-	nums = []int{2,2,2,3,2,2,2}
+	nums = []int{2, 2, 2, 3, 2, 2, 2}
 	found = solution.SearchRepeats(nums, 3)
 	if !found {
 		t.Fatalf("Expected %t, but was %t", true, false)
 	}
 
-	nums = []int{1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1}
+	nums = []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1}
 	found = solution.SearchRepeats(nums, 2)
 	if !found {
 		t.Fatalf("Expected %t, but was %t", true, false)
+	}
+}
+
+func TestFindDuplicate(t *testing.T) {
+	nums := []int{1, 3, 4, 2, 2}
+	v := solution.FindDuplicate(nums)
+	if v != 2 {
+		t.Fatalf("Expected 2, but was %d", v)
+	}
+
+	nums = []int{3, 1, 3, 4, 2}
+	v = solution.FindDuplicate(nums)
+	if v != 3 {
+		t.Fatalf("Expected 3, but was %d", v)
+	}
+
+	nums = []int{3,3,3,3,3}
+	v = solution.FindDuplicate(nums)
+	if v != 3 {
+		t.Fatalf("Expected 3, but was %d", v)
 	}
 }

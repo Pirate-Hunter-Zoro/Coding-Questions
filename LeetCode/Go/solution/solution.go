@@ -701,8 +701,8 @@ func Search(nums []int, target int) int {
 Helper method to search for an integer in nums, which is sorted except for a pivot
 */
 func searchPivot(nums []int, left int, right int, target int) int {
-	if right - left < 3 {
-		if right - left < 2 {
+	if right-left < 3 {
+		if right-left < 2 {
 			if nums[left] == target {
 				return left
 			} else {
@@ -712,7 +712,7 @@ func searchPivot(nums []int, left int, right int, target int) int {
 			if nums[left] == target {
 				return left
 			} else if nums[left+1] == target {
-				return left+1
+				return left + 1
 			} else {
 				return -1
 			}
@@ -778,7 +778,7 @@ Link:
 https://leetcode.com/problems/search-in-rotated-sorted-array-ii/description/
 */
 func SearchRepeats(nums []int, target int) bool {
-	if nums[0] == nums[len(nums) - 1] {
+	if nums[0] == nums[len(nums)-1] {
 		// then the pivot is in the middle of a bunch of repeats
 		if len(nums) < 3 {
 			if len(nums) < 2 {
@@ -793,7 +793,7 @@ func SearchRepeats(nums []int, target int) bool {
 			return true
 		}
 		left := 1
-		right := len(nums)-1
+		right := len(nums) - 1
 		for nums[left] == v && nums[right] == v && left < right {
 			left++
 			right--
@@ -830,4 +830,54 @@ func binarySearch(nums []int, left int, right int, target int) int {
 		}
 	}
 	return -1
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an array of integers nums containing n + 1 integers where each integer is in the range [1, n] inclusive.
+
+There is only one repeated number in nums, return this repeated number.
+
+You must solve the problem without modifying the array nums and uses only constant extra space.
+
+Link:
+https://leetcode.com/problems/find-the-duplicate-number/description/?envType=daily-question&envId=2024-03-24
+
+Solution Link:
+https://keithschwarz.com/interesting/code/?dir=find-duplicate
+*/
+func FindDuplicate(nums []int) int {
+	// This will form a Ro-shaped sequence - we need to find the beginning of the loop
+	n := len(nums) - 1
+	slow := n+1
+	fast := n+1
+	slow = nums[slow-1]
+	fast = nums[nums[fast-1]-1]
+
+	// Iterate slow and fast such that if slow = x_j, fast = x_{2j}
+	for slow != fast {
+		slow = nums[slow-1]
+		fast = nums[nums[fast-1]-1]
+	}
+
+	// Now that slow = fast, slow = x_j, fast = x_{2j}
+	// Let length of chain leading up to loop = c
+	// Let loop length = l. j is the smallest multiple of l bigger than c
+	// Proof: j > c because it must be in the loop
+	//		  Also, since x_j=x_{2j}, is j iterations must mean we go around the loop a fixed number of times, so j is a multiple of l
+	//		  j is the smallest such multiply of l because any smaller such multiple of l, our above iteration would have hit first
+	
+	// Now find the starting point of the loop
+	finder := n+1 // x_0
+	// Also recall slow = x_j
+	// Further, x_{c+j} is equivalent to iterating up to the start of the loop, and progressing around the loop an integer number of times
+	// So you'll end up at the start of the loop after starting at x_0 and going through c+j iterations, and slow has already done j iterations
+	// Therefore, after c iterations, finder will be at x_c - the start of the loop - by definition, and so will slow
+	for slow != finder {
+		finder = nums[finder-1]
+		slow = nums[slow-1]
+	}
+
+	return finder
 }
