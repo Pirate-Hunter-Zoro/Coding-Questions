@@ -883,6 +883,20 @@ func FindDuplicate(nums []int) int {
 	return finder
 }
 
+/*
+Given an integer array nums of length n where all the integers of nums are in the range [1, n] and each integer appears once or twice, return an array of all the integers that appears twice.
+
+You must write an algorithm that runs in O(n) time and uses only constant extra space.
+
+Link:
+https://leetcode.com/problems/find-all-duplicates-in-an-array/description/?envType=daily-question&envId=2024-03-25
+*/
+func FindDuplicates(nums []int) []int {
+	duplicates := []int{}
+
+	return duplicates
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
