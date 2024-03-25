@@ -228,9 +228,26 @@ func TestFindDuplicate(t *testing.T) {
 		t.Fatalf("Expected 3, but was %d", v)
 	}
 
-	nums = []int{3,3,3,3,3}
+	nums = []int{3, 3, 3, 3, 3}
 	v = solution.FindDuplicate(nums)
 	if v != 3 {
 		t.Fatalf("Expected 3, but was %d", v)
+	}
+}
+
+func TestCountVowelPermutations(t *testing.T) {
+	v := solution.CountVowelPermutation(1)
+	if v != 5 {
+		t.Fatalf("Expected 5, but was %d", v)
+	}
+
+	v = solution.CountVowelPermutation(2)
+	if v != 10 {
+		t.Fatalf("Expected 10, but was %d", v)
+	}
+
+	v = solution.CountVowelPermutation(5)
+	if v != 68 {
+		t.Fatalf("Expected 68, but was %d", v)
 	}
 }

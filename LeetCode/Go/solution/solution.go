@@ -900,5 +900,69 @@ Link:
 https://leetcode.com/problems/count-vowels-permutation/?envType=daily-question&envId=2024-03-24
 */
 func CountVowelPermutation(n int) int {
-	return modulo.ModularAdd(n, n)
+	chars := map[byte]int{
+		'a': 0,
+		'e': 1,
+		'i': 2,
+		'o': 3,
+		'u': 4,
+	}
+	can_follow := map[byte][]byte{
+		'a': {'e'},
+		'e': {'a', 'i'},
+		'i': {'a', 'e', 'o', 'u'},
+		'o': {'i', 'u'},
+		'u': {'a'},
+	}
+	sols := make([][]int, len(chars))
+	for i := 0; i < len(sols); i++ {
+		sols[i] = make([]int, n)
+		sols[i][0] = 1
+	}
+	total := 0
+	// we could start with any vowel
+	for vowel := range chars {
+		total = modulo.ModularAdd(total, topDownVowelPermutation(n, vowel, sols, chars, can_follow))
+	}
+	return total
+}
+
+/*
+Top down helper method to find the number of vowel combinations we cna make of the given length and the vowel we are starting
+*/
+func topDownVowelPermutation(n int, vowel byte, sols [][]int, chars map[byte]int, can_follow map[byte][]byte) int {
+
+	if sols[chars[vowel]][n-1] == 0 {
+		// Need to solve this problem
+		total := 0
+		// Consider each character who can follow
+		for _, character := range can_follow[vowel] {
+			total = modulo.ModularAdd(total, topDownVowelPermutation(n-1, character, sols, chars, can_follow))
+		}
+		sols[chars[vowel]][n-1] = total
+	}
+
+	return sols[chars[vowel]][n-1]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+There are buckets buckets of liquid, where exactly one of the buckets is poisonous. To figure out which one is poisonous, you feed some number of (poor) pigs the liquid to see whether they will die or not. Unfortunately, you only have minutesToTest minutes to determine which bucket is poisonous.
+
+You can feed the pigs according to these steps:
+
+1) Choose some live pigs to feed.
+2) For each pig, choose which buckets to feed it. The pig will consume all the chosen buckets simultaneously and will take no time. Each pig can feed from any number of buckets, and each bucket can be fed from by any number of pigs.
+3) Wait for minutesToDie minutes. You may not feed any other pigs during this time.
+4) After minutesToDie minutes have passed, any pigs that have been fed the poisonous bucket will die, and all others will survive.
+5) Repeat this process until you run out of time.
+
+Given buckets, minutesToDie, and minutesToTest, return the minimum number of pigs needed to figure out which bucket is poisonous within the allotted time.
+
+Link:
+https://leetcode.com/problems/poor-pigs/description/?envType=daily-question&envId=2024-03-24
+*/
+func PoorPigs(buckets int, minutesToDie int, minutesToTest int) int {
+	return 0
 }
