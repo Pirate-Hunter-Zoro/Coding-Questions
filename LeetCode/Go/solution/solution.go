@@ -978,5 +978,14 @@ Link:
 https://leetcode.com/problems/poor-pigs/description/?envType=daily-question&envId=2024-03-24
 */
 func PoorPigs(buckets int, minutesToDie int, minutesToTest int) int {
-	return 0
+	// According to the hints on LeetCode:
+	// Say you have X pigs, and time enough for T test rounds.
+	// How many different states does that generate?
+	// Each pig could die on any of the rounds, or none of them, making T+1 total possibilities for each pig.
+	// That's (T+1)^X possible states achieved, each corresponding to a different bucket being poisoned.
+	// So pick X such that (T+1)^X >= buckets!
+	toDie := float64(minutesToDie)
+    toTest := float64(minutesToTest)
+    T := math.Floor(toTest/toDie)
+    return int(math.Ceil(math.Log2(float64(buckets))/math.Log2(float64(T+1))))
 }
