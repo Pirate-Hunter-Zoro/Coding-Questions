@@ -888,12 +888,24 @@ Given an integer array nums of length n where all the integers of nums are in th
 
 You must write an algorithm that runs in O(n) time and uses only constant extra space.
 
+Solution Discussion Credit:
+https://leetcode.com/nextsde/
+
 Link:
 https://leetcode.com/problems/find-all-duplicates-in-an-array/description/?envType=daily-question&envId=2024-03-25
 */
 func FindDuplicates(nums []int) []int {
 	duplicates := []int{}
-
+	for _, v := range nums {
+		v = int(math.Abs(float64(v)))
+		if nums[v-1] < 0 {
+			// Then that means v is a repeat, we ran into this value before because we have already flipped the OTHER value in array position THIS value minus 1
+			duplicates = append(duplicates, v)
+		} else {
+			nums[v-1] = -nums[v-1]
+		}
+	}
+	
 	return duplicates
 }
 
