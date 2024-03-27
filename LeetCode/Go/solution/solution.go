@@ -905,7 +905,7 @@ func FindDuplicates(nums []int) []int {
 			nums[v-1] = -nums[v-1]
 		}
 	}
-	
+
 	return duplicates
 }
 
@@ -997,7 +997,86 @@ func PoorPigs(buckets int, minutesToDie int, minutesToTest int) int {
 	// That's (T+1)^X possible states achieved, each corresponding to a different bucket being poisoned.
 	// So pick X such that (T+1)^X >= buckets!
 	toDie := float64(minutesToDie)
-    toTest := float64(minutesToTest)
-    T := math.Floor(toTest/toDie)
-    return int(math.Ceil(math.Log2(float64(buckets))/math.Log2(float64(T+1))))
+	toTest := float64(minutesToTest)
+	T := math.Floor(toTest / toDie)
+	return int(math.Ceil(math.Log2(float64(buckets)) / math.Log2(float64(T+1))))
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an array of integers nums and an integer k, return the number of contiguous subarrays where the product of all the elements in the subarray is strictly less than k.
+
+Link:
+https://leetcode.com/problems/subarray-product-less-than-k/description/?envType=daily-question&envId=2024-03-27
+*/
+func NumSubarrayProductLessThanK(nums []int, k int) int {
+	// Hint:
+	// For each j, let opt(j) be the smallest i so that nums[i] * nums[i+1] * ... * nums[j] is less than k.
+	// Note that opt is an increasing function.
+	// Sliding window - initialize the window first
+	left := 0
+	prod := nums[left]
+	for prod >= k {
+		left++
+		if left < len(nums) {
+			prod = nums[left]
+		} else {
+			break
+		}
+	}
+	if left == len(nums) {
+		return 0
+	}
+	right := left
+	count := 1
+	for prod < k {
+		right++
+		if right < len(nums) && prod*nums[right] < k {
+			prod *= nums[right]
+			count += right - left + 1
+		} else {
+			right--
+			break
+		}
+	}
+	// Now that we have our biggest initial window possible, slide the window to the right
+	for left < len(nums)-1 {
+		left++
+		prod /= nums[left-1]
+		if right < left {
+			right++
+			prod *= nums[right]
+			if prod < k {
+				count++
+			}
+		}
+		for prod >= k {
+			left++
+			if left >= len(nums){
+				break
+			}
+			prod /= nums[left-1]
+			if right < left {
+				right++
+				prod *= nums[right]
+				if prod < k {
+					count++
+				}
+			}
+		}
+		// We have not found the next right window that achieves a product less than k
+		for prod < k {
+			right++
+			if right < len(nums) && prod * nums[right] < k {
+				prod *= nums[right]
+				count += right - left + 1
+			} else {
+				right--
+				break
+			}
+		}
+	}
+
+	return count
 }

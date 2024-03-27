@@ -251,3 +251,26 @@ func TestCountVowelPermutations(t *testing.T) {
 		t.Fatalf("Expected 68, but was %d", v)
 	}
 }
+
+func TestNumSubarrayProductLessThanK(t *testing.T) {
+	nums := []int{10, 5, 2, 6}
+	k := 100
+	v := solution.NumSubarrayProductLessThanK(nums, k)
+	if v != 8 {
+		t.Fatalf("Expected 8, but got %d", v)
+	}
+
+	nums = []int{1, 2, 3}
+	k = 0
+	v = solution.NumSubarrayProductLessThanK(nums, k)
+	if v != 0 {
+		t.Fatalf("Expected 0, but got %d", v)
+	}
+
+	nums = []int{10, 9, 10, 4, 3, 8, 3, 3, 6, 2, 10, 10, 9, 3}
+	k = 19
+	v = solution.NumSubarrayProductLessThanK(nums, k)
+	if v != 18 {
+		t.Fatalf("Expected 18, but got %d", v)
+	}
+}
